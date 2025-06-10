@@ -1,0 +1,51 @@
+---
+title: "Day 1 Postmortem"
+author: "Erik Westlund"
+date: "2025-06-11"
+---
+
+## Video Recording
+
+The video recording [can be viewed by clicking here](https://jhjhm.zoom.us/rec/share/Iu4A1lXMQABA7H2XVvEKRaEkEdeCrL_kBupYeg7xYx2XK4tLQamRmrWPv9xzeg1h.ZjT5VqzQcupYroS3?startTime=1749561883000)
+
+The password has been shared via email and CoursePlus.
+
+## Slides To Revisit
+
+For time reasons, I skipped over a handful of slides. It would be a good idea to review the "Project Organization & Tooling" (slides 38-48) [in the post lecture slides](https://github.com/erikwestlund/data-viz-summer-25/blob/main/slides/day_1.html). These dlies go over strategies for how to organize your project's files.
+
+## Homework
+
+For Problem Set 1, you are asked to create a handful of visualizations using a Quarto notebook.  I suggested a histogram, scatterplot, and a bar chart. 
+
+Slides 74-92 have code you can repurpose. You can also use LLMs if that helps.  If you would prefer to try something other than a bar chart, histogram, or scatterplot, that is fine.  I just want you to get practice "getting something on the page".
+
+Tomorrow we will go into more detail on the logic and syntax of `ggplot2`.
+
+## `.gitignore` and Quarto 
+
+Quarto can sometimes be a bit finnicky with what files it leaves behind when you render a notebook.  You may wan to keep rendered files out of your git repository. 
+
+You can do this by adding the following to your `.gitignore` file:
+
+```
+.quarto/
+*_cache/
+*_files/
+*_site/
+/cache/
+```
+
+You can adjust as needed. Tgis prevents any "work" files that Quarto creates. 
+
+If you wanted to also excluded rendered files, you could add the following to your `.gitignore` file:
+
+```
+*.docx
+*.html
+```
+
+
+## Closing Thoughts
+
+Day 1 is tooling heavy and visualization-light.  I appreciate your patience. Tomorrow we will get far more into the theory and practice of visualization.

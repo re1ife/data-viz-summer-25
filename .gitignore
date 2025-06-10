@@ -112,3 +112,5 @@ lectures/**/_freeze/
 # Slides
 !slides/*.html
 !slides/day_1.html
+
+/.quarto/

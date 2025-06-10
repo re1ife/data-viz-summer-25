@@ -1079,8 +1079,8 @@ Erik Westlund
   <p class="date">2025-06-03</p>
 </section>
 <section>
-<section id="day-2-ai-llms-data-preparation-and-grammar-of-graphics" class="title-slide slide level1 center">
-<h1>Day 2: AI &amp; LLMs, Data Preparation and Grammar of Graphics</h1>
+<section id="day-2-ai-llms-data-preparation-and-the-grammar-of-graphics" class="title-slide slide level1 center">
+<h1>Day 2: AI &amp; LLMs, Data Preparation, and the Grammar of Graphics</h1>
 
 </section>
 <section id="overview-for-day-2" class="slide level2">
@@ -1097,39 +1097,129 @@ Erik Westlund
 <h2>AI &amp; LLMs: An Illustration</h2>
 <ul>
 <li>We’ll use an LLM to help us prepare data for a visualization</li>
-<li>Let’s start with the mtcars data set and just chat with the bot and so how far we can get</li>
+<li>We’ll work with the <code>ai_example.qmd</code> file in the <code>examples</code> directory</li>
+</ul>
+</section></section>
+<section>
+<section id="data-preparation" class="title-slide slide level1 center">
+<h1>Data Preparation</h1>
+
+</section>
+<section id="getting-data-ready-for-visualization" class="slide level2">
+<h2>Getting Data Ready For Visualization</h2>
+<ul>
+<li><p>Before we can do any visualization, we need to load in data and prepare it</p></li>
+<li><p>Take this step seriously, especially your variable names, as your code depends on it</p></li>
+<li><p>Workflow options:</p>
+<ol type="1">
+<li>Clean up the data in a block at the top of your notebook</li>
+<li>Separate out the data preparation from the visualization code</li>
+</ol></li>
+<li><p>There are no universal answers to the best approach here; friction as you work often tells you what to do</p></li>
 </ul>
 </section>
-<section id="data-preparation" class="slide level2">
-<h2>Data Preparation</h2>
-<!-- ## Data Preparation
-
-* Cleaning and transforming data
-* Handling missing values
-* Data types and their impact on visualization
-* Best practices for data preparation
-
-## Grammar of Graphics
-
-* Understanding the components
-* Mapping data to visual elements
-* Scales and coordinate systems
-* Faceting and grouping
-
-## Basic Plot Types
-
-* Scatter plots
-* Line plots
-* Bar charts
-* Histograms
-* Box plots
-
-## Data Transformation
-
-* Aggregation
-* Reshaping
-* Filtering
-* Creating derived variables  -->
+<section id="option-1-clean-up-the-data-in-a-block-at-the-top-of-your-notebook" class="slide level2">
+<h2>Option 1: Clean up the data in a block at the top of your notebook</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h4 class="panel-heading" style="color: green;" id="benefits">Benefits</h4>
+<ul>
+<li>Quick and straightforward</li>
+<li>All code in one place</li>
+<li>Easy for you and others to follow the workflow</li>
+<li>Good for exploratory analysis</li>
+<li>Minimal file management</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h4 class="panel-heading" style="color: red;" id="drawbacks">Drawbacks</h4>
+<ul>
+<li>Can become messy with large datasets</li>
+<li>Expensive transformations take time to run every time you run the notebook</li>
+<li>Harder to reuse code, especially in analyses with multiple steps</li>
+<li>Your colleagues may not care about the data preparation</li>
+</ul>
+</div></div>
+</section>
+<section id="option-2-separate-out-the-data-preparation-from-the-visualization-code" class="slide level2">
+<h2>Option 2: Separate out the data preparation from the visualization code</h2>
+<ul>
+<li><p>In this approach, you prepare the data in a separate script or notebook</p></li>
+<li><p>You can then load the data into your visualization notebook</p></li>
+<li><p>Two options:</p>
+<ol type="1">
+<li>Run the data preparation script before running the visualization script</li>
+<li>Run the data preparation script as part of the visualization script</li>
+</ol></li>
+<li><p>Example of (1) above provided in our <code>examples/project-example</code> directory</p></li>
+</ul>
+</section>
+<section id="benefitsdrawbacks-of-separating-scripts" class="slide level2">
+<h2>Benefits/Drawbacks of separating scripts</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<h4 class="panel-heading" style="color: green;" id="benefits-1">Benefits</h4>
+<ul>
+<li>Data preparation notebook serves as documentation of your data</li>
+<li>Data preparation can be reused across projects</li>
+<li>Better separation of concerns</li>
+<li>Often asier to maintain and update</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<h4 class="panel-heading" style="color: red;" id="drawbacks-1">Drawbacks</h4>
+<ul>
+<li>More files to manage</li>
+<li>Need to ensure data preparation is run in the right order</li>
+<li>Can be overkill for simple projects</li>
+<li>More complex project structure</li>
+</ul>
+</div></div>
+</section>
+<section id="saving-data-to-load-later" class="slide level2">
+<h2>Saving Data To Load Later</h2>
+<ul>
+<li><p>When using separate scripts, you’ll often want to save a copy of your cleaned data to load later scripts/notebooks</p></li>
+<li><p>A good option here is use the <code>saveRDS</code> function to save your data as an R data object</p></li>
+<li><p>This has a few benefits</p>
+<ul>
+<li>RDS files maintain all R metadata</li>
+<li>You can quickly load the data into R with <code>readRDS</code>, which can save you a lot of time when working with large datasets</li>
+<li>RDS files are not easily to accidentally modify</li>
+</ul></li>
+</ul>
+</section>
+<section id="preparing-variables" class="slide level2">
+<h2>Preparing Variables</h2>
+<ul>
+<li></li>
+</ul>
+</section>
+<section id="grammar-of-graphics" class="slide level2">
+<h2>Grammar of Graphics</h2>
+<ul>
+<li>Understanding the components</li>
+<li>Mapping data to visual elements</li>
+<li>Scales and coordinate systems</li>
+<li>Faceting and grouping</li>
+</ul>
+</section>
+<section id="basic-plot-types" class="slide level2">
+<h2>Basic Plot Types</h2>
+<ul>
+<li>Scatter plots</li>
+<li>Line plots</li>
+<li>Bar charts</li>
+<li>Histograms</li>
+<li>Box plots</li>
+</ul>
+</section>
+<section id="data-transformation" class="slide level2">
+<h2>Data Transformation</h2>
+<ul>
+<li>Aggregation</li>
+<li>Reshaping</li>
+<li>Filtering</li>
+<li>Creating derived variables</li>
+</ul>
 
 </section></section>
     </div>
