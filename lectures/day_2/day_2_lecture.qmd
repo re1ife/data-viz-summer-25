@@ -101,12 +101,129 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
     - You can quickly load the data into R with `readRDS`, which can save you a lot of time when working with large datasets
     - RDS files are not easily to accidentally modify
 
-## Preparing Variables
+## Preparing Data Example
 
-* 
+* I have created an example of data preparation in the `examples/prams_1_data_prep.qmd` file
+* Let's load this up in RStudio and step through it.
+* Note that we'll be opening the entire course repo as a project, so the root directory is one level up from the `examples` directory
+* We will return to this data file later to visualize it
 
 ## Grammar of Graphics
 
+
+* The "gg" in ggplot2 stands for the grammar of graphics, a concept coined by Leland Wilkinson and popularized by Hadley Wickham.
+* Grammar in language is a set of rules for how language is structured.
+* Grammar in graphics is a set of rules for how visual representations of data are structured.
+
+## Key Concepts in ggplot2
+
+![ggplot2 workflow](images/gg-flow.png)
+
+
+## `ggplot2` Workflow
+
+::: {.incremental}
+1. Start with data
+2. Pick an aesthetic mapping
+3. Choose a geometric object 
+4. Add statistical transformations
+5. Adjust finer details: scales, coordinate systems, faceting, etc.
+:::
+
+## Aesthetic Mappings
+
+
+* This is how your variables map onto the aesthetics of your figure
+* It sounds highfalutin, but it usually just means:
+    - What is your x?
+    - What is your y?
+
+## Geometric Objects ("geoms")
+
+* Geoms are the elements used to represent the data
+* Geoms have associated stats/functions/statistical transformations 
+* Stats such as counts for groups often involve aggregations
+
+## Geoms (cont.)
+
+| Geom | R Function | Stat/Transformation | Use for |
+|------|------------|-------------------|----------|
+| Point | `geom_point()` | Identity | Scatter plots |
+| Bar | `geom_bar()` | Count | Bar plots |
+| AB Line | `geom_abline()` | Slope | Line plots |
+| Horizontal line | `geom_hline()` | Y intercept | Reference lines |
+| Vertical line | `geom_vline()` | X intercept | Reference lines |
+| Smoother | `geom_smooth()` | Smoothing function (GAM, Loess, etc.) | Showing patterns/trends | 
+
+## Position/Fill
+
+
+* You can use position/fill to move elements around and color code geoms by aspects of the data, such as categories.
+* For example, with a bar chart:
+
+    - `stack`: Stack bars on top of each other 
+    - `fill`: Stack bars, but make them always fill up vertical space to 1
+    - `dodge`: Put the bars next to each other
+
+* Tip: When you reach for fill, always consider faceting in small multiples. The brain struggles with fills. More on this later.
+
+## Aggregations
+
+* To make a bar chart, one groups data and takes a mean, proportion, or count
+* Software like ggplot will try to do this for you and it works well for simple cases
+* This can fail with more difficult aggregations or when doing things like applying annotation labels
+* A powerful and frustration-reducing technique is to do the aggregation yourself and then use the `identity` mapping
+* This separates the statistical logic from the visual logic and is often what makes a tricky figure easier to make
+
+## Illustration
+
+* Let's load the `prams_2_ggplot_concepts.qmd` file
+* In this file we will load the data we prepared in the previous file
+* We will then work through the key ggplot2 concepts with examples.
+* We will iterate on the figure to make it more informative and visually appealing
+
+# Colors & Accessibility
+
+## Colors
+
+* Colors are a powerful tool for communicating information
+* They can be used to highlight important information and create a visual hierarchy
+
+## RColorBrewer
+
+::: {.columns}
+::: {.column width="60%"}
+* The `RColorBrewer` package gives good default color schemes that are accessible (i.e., easy to read for everyone) and aesthetically pleasing.
+* `ggplot` by default picks out pleasing colors that are distinguishable from each other by the human eye. 
+:::
+
+::: {.column width="40%"}
+![Accessible color swatches](images/accessible_swatches.png)
+:::
+:::
+
+## Using a Color Design System
+
+:::: {.columns}
+::: {.column width="50%"}
+* A design system is a set of rules for how to create a consistent visual language
+* If you are really polishing, you might want to use a color design system
+* To the right is an example drawn from the `colors.R` file in the `examples` directory, which implements [TailwindCSS's color palette](https://tailwindcss.com/docs/customizing-colors)
+:::
+
+::: {.column width="50%"}
+![Tailwind Color Palette](images/tailwind.png)
+:::
+::::
+
+## Example
+
+* In the `examples/colors_example.qmd` file, we will explore the use of color design systems and perceptually uniform colors
+* We will also explore the use of the `viridis` package, which provides perceptually uniform, colorblind-friendly options
+
+
+
+<!-- 
 * Understanding the components
 * Mapping data to visual elements
 * Scales and coordinate systems
@@ -125,4 +242,4 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 * Aggregation
 * Reshaping
 * Filtering
-* Creating derived variables 
+* Creating derived variables  -->

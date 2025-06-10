@@ -1,0 +1,225 @@
+---
+title: "Color Systems in R"
+author: "Erik Westlund"
+date: "2025-06-11"
+format: html
+editor:
+    render-on-save: true
+---
+
+```{r setup}
+#| message: false
+
+library(dplyr)
+library(ggplot2)
+library(RColorBrewer)
+library(viridis)
+library(kableExtra)
+```
+
+## Color Systems in R
+
+There are several approaches to color in data visualization:
+
+1. **Data-focused colors** (RColorBrewer): Designed for accessibility and clear data communication
+2. **Perceptually uniform colors** (viridis): Colorblind-friendly palettes with perceptual uniformity
+3. **Design system colors** (Tailwind): For polished, consistent visual language
+
+## RColorBrewer: Accessible Data Visualization
+
+RColorBrewer provides several types of color palettes designed for data visualization:
+
+* Sequential: for ordered data (e.g., "Blues", "Greens")
+* Diverging: for data that deviates from a middle value (e.g., "RdBu", "Spectral")
+* Qualitative: for categorical data (e.g., "Set1", "Set2")
+
+Here are some examples of RColorBrewer palettes:
+
+```{r brewer-display}
+#| message: false
+
+# Create a function to display color palettes
+display_brewer_pal <- function(name, n) {
+  colors <- brewer.pal(n, name)
+  plot(1:n, rep(1, n), 
+       col = colors, 
+       pch = 19, 
+       cex = 5,
+       xlab = "", 
+       ylab = "",
+       axes = FALSE)
+  title(name)
+}
+
+# Display some example palettes
+par(mfrow = c(2, 2))
+display_brewer_pal("Blues", 9)    # Sequential
+display_brewer_pal("RdBu", 9)     # Diverging
+display_brewer_pal("Set1", 9)     # Qualitative
+display_brewer_pal("Spectral", 9) # Diverging
+```
+
+## Using RColorBrewer in ggplot2
+
+Here's how RColorBrewer can be used in different visualization scenarios:
+
+```{r brewer-ggplot}
+#| message: false
+
+# Create example data
+df <- data.frame(
+  category = letters[1:5],
+  value = c(10, 20, 15, 25, 30)
+)
+
+# Plot with qualitative colors (categorical data)
+ggplot(df, aes(x = category, y = value, fill = category)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Set1") +
+  labs(title = "Qualitative Colors (Set1)") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+# Plot with sequential colors (ordered data)
+ggplot(df, aes(x = category, y = value, fill = value)) +
+  geom_bar(stat = "identity") +
+  scale_fill_distiller(palette = "Blues") +
+  labs(title = "Sequential Colors (Blues)") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+# Plot with diverging colors (deviation from mean)
+df$deviation <- df$value - mean(df$value)
+ggplot(df, aes(x = category, y = value, fill = deviation)) +
+  geom_bar(stat = "identity") +
+  scale_fill_distiller(palette = "RdBu") +
+  labs(title = "Diverging Colors (RdBu)") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+```
+
+## Viridis: Perceptually Uniform Colors
+
+The viridis package provides colorblind-friendly palettes that are perceptually uniform. This means the colors are designed to be distinguishable even when converted to grayscale:
+
+```{r viridis-display}
+#| message: false
+
+# Create a function to display viridis palettes
+display_viridis_pal <- function(option, n) {
+  colors <- viridis(n, option = option)
+  plot(1:n, rep(1, n), 
+       col = colors, 
+       pch = 19, 
+       cex = 5,
+       xlab = "", 
+       ylab = "",
+       axes = FALSE)
+  title(option)
+}
+
+# Display viridis palettes
+par(mfrow = c(2, 2))
+display_viridis_pal("viridis", 9)     # Default viridis
+display_viridis_pal("magma", 9)       # Magma
+display_viridis_pal("plasma", 9)      # Plasma
+display_viridis_pal("inferno", 9)     # Inferno
+```
+
+Here's how viridis can be used in ggplot2:
+
+```{r viridis-ggplot}
+#| message: false
+
+# Create example data with more categories
+df <- data.frame(
+  category = letters[1:8],
+  value = c(10, 20, 15, 25, 30, 22, 18, 27)
+)
+
+# Plot with viridis colors
+ggplot(df, aes(x = category, y = value, fill = value)) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis() +
+  labs(title = "Viridis Colors") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+# Plot with magma colors
+ggplot(df, aes(x = category, y = value, fill = value)) +
+  geom_bar(stat = "identity") +
+  scale_fill_viridis(option = "magma") +
+  labs(title = "Magma Colors") +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+```
+
+## Tailwind: One Option for Custom Design
+
+Tailwind's color palette offers another approach to visualization design. Here's an example of how you might use it to create visual hierarchy and data representation:
+
+```{r tailwind-example}
+#| message: false
+
+# Source the Tailwind colors
+source("colors.R")
+
+# Create example data with categories and subcategories
+df <- data.frame(
+  category = rep(c("Category A", "Category B", "Category C"), each = 3),
+  subcategory = rep(c("Sub 1", "Sub 2", "Sub 3"), times = 3),
+  value = c(25, 15, 10, 30, 20, 15, 35, 25, 20)
+)
+
+# One way to create visual hierarchy with grays
+custom_theme <- theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = colors[["gray"]][["50"]], color = NA),
+    panel.background = element_rect(fill = colors[["gray"]][["50"]], color = NA),
+    axis.text = element_text(color = colors[["gray"]][["700"]]),
+    axis.title = element_text(color = colors[["gray"]][["900"]]),
+    plot.title = element_text(color = colors[["gray"]][["900"]], face = "bold"),
+    legend.text = element_text(color = colors[["gray"]][["700"]]),
+    legend.title = element_text(color = colors[["gray"]][["900"]])
+  )
+
+# One approach to using blues for data representation
+blue_palette <- c(
+  colors[["blue"]][["300"]],
+  colors[["blue"]][["500"]],
+  colors[["blue"]][["700"]]
+)
+
+# The resulting visualization
+ggplot(df, aes(x = category, y = value, fill = subcategory)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  scale_fill_manual(values = blue_palette) +
+  labs(
+    title = "Sales by Category and Subcategory",
+    x = NULL,
+    y = "Value",
+    fill = "Subcategory"
+  ) +
+  custom_theme
+```
+
+## Considerations for Color Choice
+
+1. **Data Visualization**:
+   - RColorBrewer offers accessible, data-focused palettes
+   - Viridis provides perceptually uniform, colorblind-friendly options
+   - Different palette types suit different data relationships
+
+2. **Design Systems**:
+   - Tailwind is one option for creating a consistent visual language
+   - Other design systems (Material, Bootstrap, etc.) offer similar approaches
+   - The key is maintaining consistency in your chosen system
+
+## Resources
+
+* [RColorBrewer Documentation](https://cran.r-project.org/web/packages/RColorBrewer/RColorBrewer.pdf)
+* [ColorBrewer Website](https://colorbrewer2.org/)
+* [Viridis Package](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html)
+* [Color Accessibility Tools](https://www.w3.org/WAI/ER/tools/)
+* [Tailwind Colors](https://tailwindcss.com/docs/customizing-colors)
