@@ -35,8 +35,14 @@ library(here)
 
 # Function to compile a single lecture
 compile_lecture <- function(lecture_file, output_dir) {
-  # Get the day number from the path
-  day_num <- path_file(path_dir(lecture_file))
+  # Get the day number from the path or filename depending on if it's a postmortem
+  is_postmortem <- grepl("postmortem", lecture_file)
+  if (is_postmortem) {
+    day_num <- path_file(lecture_file)
+    day_num <- sub("\\.qmd$", "", day_num)  # Remove .qmd extension
+  } else {
+    day_num <- path_file(path_dir(lecture_file))
+  }
   
   # Create output directory if it doesn't exist
   dir_create(here(output_dir), recurse = TRUE)
@@ -53,7 +59,7 @@ compile_lecture <- function(lecture_file, output_dir) {
     system(sprintf("quarto render %s", path_file(lecture_file)))
     
     # Move the rendered file to the output directory
-    rendered_file <- paste0(day_num, "_lecture.html")
+    rendered_file <- paste0(day_num, ".html")
     if (file_exists(rendered_file)) {
       file_move(
         rendered_file,
@@ -74,7 +80,8 @@ compile_lecture <- function(lecture_file, output_dir) {
 lecture_files <- c(
   here("lectures", "day_1", "day_1_lecture.qmd"),
   here("lectures", "day_2", "day_2_lecture.qmd"),
-  here("lectures", "day_3", "day_3_lecture.qmd")
+  here("lectures", "day_3", "day_3_lecture.qmd"),
+  here("postmortems", "day_1_postmortem.qmd")
 )
 
 # Create main output directory if it doesn't exist
