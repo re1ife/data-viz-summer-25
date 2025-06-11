@@ -66,6 +66,8 @@ git fetch upstream
 git merge upstream/main
 ```
 
+If you get prompted with a screen full of changes in the `vim` editor, you can type `:wq` to save and exit.
+
 ## Working with the Repository
 
 ### Where to Put Your Work
