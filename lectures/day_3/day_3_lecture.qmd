@@ -1,12 +1,416 @@
 ---
 title: "Data Visualization: Day 3"
 author: "Erik Westlund"
-date: "2025-06-04"
+date: "2025-06-12"
 date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 ---
 
-# Day 3: Advanced Visualization Techniques
+```{r setup}
+#| echo: false
+#| message: false
+#| warning: false
 
-## Overview
+library(dplyr)
+library(purrr)
+library(janitor)
+library(dagitty)
+library(forcats)
+library(ggdag)
+library(ggplot2)
+library(ggtext)
+library(stringr)
+library(kableExtra)
+```
 
-* Coming soon!
+
+# Day 3: What to Visualize – From Question to Plot
+
+## Overview for Day 3
+
+::: {.incremental}
+- Scientific questions and DAGs
+- What to visualize: distributions, time, space, relationships, models
+- Key design principles: honesty, annotation, small multiples
+- Case studies: 7 applied examples
+:::
+
+
+## Theme: Science Drives Visualization
+
+* Data visualization is valuable for its scientific application
+* It helps us:
+    - Understand our data
+    - Understand our models
+    - Communicate our findings in an impactful way
+
+# DAGs, Scientific Complexity, Causal Inference, and Visualization
+
+## From Question to DAG to Plot
+
+* We'll start with a scientific question.
+* We'll sketch out the causal structure using a DAG.
+* From this, we can assess typical problems scientific studies like this face
+* We can then use the DAG to guide our visualization choices
+
+## Scientific Question
+
+"What causes mothers to receive comprehensive postnatal care?"
+
+## Directed Acyclic Graphs
+
+* A DAG is a graph that represents the causal relationships between variables.
+* It is a directed graph, meaning that the edges have a direction.
+* It is an acyclic graph, meaning that there are no cycles in the graph.
+* It is a graph, meaning that it has nodes and edges.
+
+## How DAGs Help Us In Science &amp; Visualization
+
+* DAGs help us:
+
+    - Identify the variables that are important to the question
+    - Identify the variables that are confounding
+    - Identify the variables that are missing
+    - Identify the variables that are measured incorrectly
+
+* Having a good idea of the causal structure of a question helps us know what to visualize.
+
+## DAGs as a Visualization Tool
+
+* DAGs:
+
+    1. are themselves visualizations
+    2. encode scientific problems and causal structures
+* We can use the `daggity` R package to visualize the the causal structure of the problems around the motivating research question
+
+## Big Picture
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r causes_general}
+rcp_dag <- dagify(RCP ~ PQ + PC + WTP + PT + RA + RP)
+
+rcp_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- RCP = "Received Comprehensive Postnatal Care"
+- PQ = "Provider Quality"
+- PC = "Personal Capacity"
+- WTP = "Willingness to Pay"
+- PT = "Provider Trust"
+- RA = "Risk Aversion"
+- RP = "Risk Profile"
+:::
+::::
+
+## Provider Quality (PQ) Sub-DAG
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r provider_quality}
+pq_dag <- dagify(
+  PQ ~ PEC,
+  PEC ~ ST
+)
+
+pq_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- PQ = "Provider Quality"
+- PEC = "Political/Economic Conditions"
+- ST = "State"
+:::
+::::
+
+## Personal Capacity (PC) Sub-DAG
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r personal_capacity}
+pc_dag <- dagify(
+  PC ~ DEP + JOB + INC + DIS,
+  DEP ~ INC + JOB + CO,
+  JOB ~ EDU + CO + R + M + I + CC,
+  DIS ~ PEC,
+  INC ~ JOB + EDU + RE + PEC + AGE
+)
+
+pc_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- PC = "Personal Capacity"
+- DEP = "Dependents"
+- JOB = "Job Type"
+- INC = "Income"
+- DIS = "Distance to Provider"
+- CO = "Cultural Orientation"
+- EDU = "Educational Attainment"
+- R = "Resilience"
+- M = "Motivation"
+- I = "Intelligence"
+- CC = "Community Connections"
+- RE = "Race/Ethnicity"
+- AGE = "Age"
+:::
+::::
+
+## Willingness to Pay (WTP) Sub-DAG
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r willingness_to_pay}
+wtp_dag <- dagify(
+  WTP ~ PQ + INC + INS + RA + CO,
+  INS ~ JOB + PEC + AGE,
+  CO ~ PED + PIN + REL + PEC + CC
+)
+
+wtp_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- WTP = "Willingness to Pay"
+- PQ = "Provider Quality"
+- INC = "Income"
+- INS = "Insurance"
+- RA = "Risk Aversion"
+- CO = "Cultural Orientation"
+- JOB = "Job Type"
+- PEC = "Political/Economic Conditions"
+- AGE = "Age"
+- PED = "Parent Education"
+- PIN = "Parent Income"
+- REL = "Religion"
+- CC = "Community Connections"
+:::
+::::
+
+## Provider Trust (PT) Sub-DAG
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r provider_trust}
+pt_dag <- dagify(
+  PT ~ PQ + RE + CO,
+  CO ~ PED + PIN + REL + PEC + CC
+)
+
+pt_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- PT = "Provider Trust"
+- PQ = "Provider Quality"
+- RE = "Race/Ethnicity"
+- CO = "Cultural Orientation"
+- PED = "Parent Education"
+- PIN = "Parent Income"
+- REL = "Religion"
+- PEC = "Political/Economic Conditions"
+- CC = "Community Connections"
+:::
+::::
+
+## Risk Aversion (RA) Sub-DAG
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r risk_aversion}
+ra_dag <- dagify(
+  RA ~ PQ + RP + INS,
+  RP ~ PQ + AGE + OBE + MG + DM + HD + PP + PR + HT + GHT,
+  INS ~ JOB + PEC + AGE
+)
+
+ra_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- RA = "Risk Aversion"
+- PQ = "Provider Quality"
+- RP = "Risk Profile"
+- INS = "Insurance"
+- AGE = "Age"
+- OBE = "Obesity"
+- MG = "Multiple Gestation"
+- DM = "Diabetes Mellitus"
+- HD = "Heart Disease"
+- PP = "Placenta Previa"
+- PR = "Preeclampsia"
+- HT = "Hypertension"
+- GHT = "Gestational Hypertension"
+- JOB = "Job Type"
+- PEC = "Political/Economic Conditions"
+:::
+::::
+
+## Risk Profile (RP) Sub-DAG
+
+:::: {.columns}
+::: {.column width="60%"}
+```{r risk_profile}
+rp_dag <- dagify(
+  RP ~ PQ + AGE + OBE + MG + DM + HD + PP + PR + HT + GHT,
+  OBE ~ PEC + AGE,
+  MG ~ AGE + OBE,
+  DM ~ AGE + OBE + INC,
+  HD ~ AGE + OBE + DM,
+  PP ~ AGE + MG,
+  PR ~ AGE + HT + GHT + MG,
+  HT ~ AGE + OBE,
+  GHT ~ HT + MG
+)
+
+rp_dag |>
+    ggdag() +
+    theme_dag()
+```
+:::
+
+::: {.column width="40%" .small}
+- RP = "Risk Profile"
+- PQ = "Provider Quality"
+- AGE = "Age"
+- OBE = "Obesity"
+- MG = "Multiple Gestation"
+- DM = "Diabetes Mellitus"
+- HD = "Heart Disease"
+- PP = "Placenta Previa"
+- PR = "Preeclampsia"
+- HT = "Hypertension"
+- GHT = "Gestational Hypertension"
+- PEC = "Political/Economic Conditions"
+- INC = "Income"
+:::
+::::
+
+## Complete DAG Codification
+
+```{r complete_dag}
+complete_dag <- dagify(
+  RCP ~ PQ + PC + WTP + PT + RA + RP,
+  PQ ~ PEC,
+  PC ~ DEP + JOB + INC + DIS,
+  WTP ~ PQ + INC + INS + RA + CO,
+  PT ~ PQ + RE + CO,
+  RA ~ PQ + RP + INS,
+  RP ~ PQ + AGE + OBE + MG + DM + HD + PP + PR + HT + GHT,
+  PEC ~ ST,
+  DEP ~ INC + JOB + CO,
+  JOB ~ EDU + CO + R + M + I + CC,
+  DIS ~ PEC,
+  INC ~ JOB + EDU + RE + PEC + AGE,
+  INS ~ JOB + PEC + AGE,
+  CO ~ PED + PIN + REL + PEC + CC,
+  PIN ~ PEC + PED,
+  EDU ~ PED + PIN + R + M + I + CC,
+  R ~ PR,
+  M ~ PM,
+  I ~ PI,
+  CC ~ PCC,
+  REL ~ RE,
+  OBE ~ PEC + AGE,
+  MG ~ AGE + OBE,
+  DM ~ AGE + OBE + INC,
+  HD ~ AGE + OBE + DM,
+  PP ~ AGE + MG,
+  PR ~ AGE + HT + GHT + MG,
+  HT ~ AGE + OBE,
+  GHT ~ HT + MG
+)
+
+```
+
+## Complete DAG Visualization
+
+```{r complete_dag_visualization}
+complete_dag |>
+    ggdag() +
+    theme_dag()
+```
+
+# DAGs and Scientific Complexity
+
+## So What?
+
+* I think it's worth stepping back and considering how complex many scientific questions really are
+* We do not always observe everythign we want to, but with the help of DAGs we can:
+    - Identify the variables that are important to the question
+    - Identify what we can actually observe
+    - Identify what we cannot observe
+    - Assess the limitations we face with causal analysis
+
+## Next Steps
+
+* We are now going to work through seven applications/case studies, each addressing a different aspect of visualization.
+* In our first case study, we will examine how to visualize spatial variation.
+
+## Side Quest: Simulated Data
+
+* In `examples/dag_sim_data.qmd` we simulated data that encodes the DAG structure.
+* Let's take a very brief glance at that file to see how we simulated the data.
+
+# Applications
+
+## Application 1: Choropleths
+
+* In `applications_1_choropleth.qmd` we create a choropleth map of the United States using the simulated data from above
+* We show how even with maps, small multiples help find clarity
+
+## Application 2: Forest Plots
+
+* In `applications_2_forest_plots.qmd` we create a forest plot of the data using the same simulated data.
+* We show how spatial variation can often be visualized better without actual maps.
+
+## Application 3: Ridgeline Plots
+
+* In `applications_3_ridge_plots.qmd` we create a ridgeline plot of the data using the same simulated data.
+* We show how ridgeline plots can show distributional differences across groups.
+
+## Application 4: Distributions
+
+* In `applications_4_distributions.qmd` we examine distributions of variables
+* Wecreate box plots and violin plots to show the distribution of a variable across a population.
+
+## Application 5: Time Trends
+
+* In `applications_5_time_trends.qmd` we examine time trends of variables
+* We create line plots to show how a variable changes over time.
+
+## Application 6: Scale Honesty & Effectiveness  
+
+* In `applications_6_scale_honesty.qmd` we examine how axes can be used to mislead or clarify
+* We briefly discuss how what counts as dishonest may be contextual
+
+## Application 7: Visualizing Models  
+
+* In `applications_7_visualizing_models.qmd` we visualize model outputs
+* We create coefficient plots and model predictions to help interpret the model
+
+
+# Summary and Takeaways
+
+* Visualization choices should be driven by the **scientific question**
+* Experimentation is key; often the "obvious" plot is not the best plot
+* Iterate: build in layers; get the basics down; then polish
+* Use small multiples, annotations, and thoughtful scales to guide the viewer
