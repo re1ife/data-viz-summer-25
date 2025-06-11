@@ -109,8 +109,8 @@ lectures/**/_freeze/
 !Syllabus.docx
 !assignments/*.docx
 
-# Rendered
-!rendered/*.html
-!rendered/**/*.html
+# Docs
+!docs/*.html
+!docs/**/*.html
 
 /.quarto/
