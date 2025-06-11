@@ -2,6 +2,12 @@
 
 This repository holds course materials for the Data Visualization course offered as part of the Johns Hopkins Bloomberg School of Public Health Graduate Summer Institute of Epidemiology and Biostatistics.
 
+## Course Website
+
+Lectures, examples, and postmortems can be accessed [at the course web site](https://erikwestlund.github.io/data-viz-summer-25).
+
+*Note*: These are just rendered quarto documents from class, which GitHub automatically publishes. The `compile_documents.R` file does all the work.
+
 ## Course Textbook
 
 We will use Kieran Healy's **Data Visualization: A Practical Introduction**, [available for free at socviz.co](https://socviz.co/) and for purchase on [Amazon](https://www.amazon.com/gp/product/0691181624/ref=as_li_tl?ie=UTF8&tag=kieranhealysw-20&camp=1789&creative=9325&linkCode=as2&creativeASIN=0691181624&linkId=16d53b3cc1ec3bc3aac60b27c29b92e8). 
