@@ -46,6 +46,8 @@ For example, in the example, we account for three variables in this way:
 
 The final plot uses three variables as well, even if it appears to use two.  The aggregation done before summarizing variables turns `subgroup` and `depression_within_3_months_birth` into a single variable.
 
+
+
 ## AI/LLM Illustration
 
 I have updated the AI example with the prompts we used (most of them) and the results of our inquiry.  
@@ -60,3 +62,98 @@ I would also note that the more detailed instructions you give the LLM, the bett
 ## Other Examples
 
 Please review the examples we worked through in class. Due to time limitations, we cannot discuss every line of code and every detail.
+
+## GitHub Issues
+
+Several students had trouble pushing to GitHub with their work.  Please try the following steps:
+
+### Using The Command Line
+
+If you having issues with RStudio's Git functionality, you can try using the command line. Click "Terminal" in the bottom left pane or select "Tools" > "Shell" > "Terminal" from the menu.
+
+There you can use the following commands:
+
+```bash
+git add .
+git commit -m "Your message"
+git push
+```
+
+### Authentication Issues
+
+If you are having trouble getting GitHub to accept your push after providing it credentials, try the following:
+
+1. Go to your GitHub account settings.
+2. Click "Developer settings"
+3. Click "Personal access tokens"
+4. Click "Generate new token (Classic)""
+5. Give it a name and description
+6. Select all boxes on "repo"
+7. Click "Generate token"
+8. Copy the token
+9. Use the token as your GitHub password when you push
+
+
+### Remote Issues
+
+Ensure your remote is set correctly.
+
+First, check out which if any remotes are set:
+
+```bash
+git remote -v
+```
+
+If you see nothing, then run:
+
+```bash
+git remote add origin https://github.com/YOUR-USERNAME/data-viz-summer-25.git
+```
+
+If you see an unfamiliar remote, you can remove it with:
+
+```bash
+git remote remove origin
+```
+
+If you see a remote, you can set it to the correct one with:
+
+```bash
+git remote set-url origin https://github.com/YOUR-USERNAME/data-viz-summer-25.git
+```
+
+Note that the above call GitHub the `origin` remote.
+
+### Master vs. Main Branch
+
+Community standards are moving away from the `master` branch to the `main` branch.  If you are using `master`, you can change it to `main` with:
+
+```bash
+git branch -m master main
+```
+
+You can then push or pull like so, assuming an `origin` remote is set:
+
+```bash
+git push origin main
+git pull origin main
+```
+
+
+### Errors About The Materials In Your Repo Being More Up To Date
+
+If you want to pull the latest materials from the repository, you can do so with the following command:
+
+```bash
+git pull
+```
+
+If you are absolutely certain you've never pushed any work up, you can force the materials in on the command line:
+
+```bash
+git push --force
+```
+
+
+This will overwrite the materials in the repository with your current work.
+
