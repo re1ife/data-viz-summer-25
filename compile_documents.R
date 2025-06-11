@@ -61,11 +61,37 @@ cleanup_temp_files <- function(file_path) {
   }
 }
 
+# Function to get the appropriate project directory for a file
+get_project_dir <- function(file_path) {
+  if (grepl("lectures", file_path)) {
+    return(here("lectures"))
+  } else if (grepl("examples", file_path)) {
+    return(here("examples"))
+  } else if (grepl("postmortems", file_path)) {
+    return(here("postmortems"))
+  }
+  return(dirname(file_path))
+}
+
+# Function to get the output file name based on the input file
+get_output_filename <- function(file_path) {
+  base_name <- basename(file_path)
+  base_name <- sub("\\.qmd$", "", base_name)  # Remove .qmd extension
+  
+  # For lectures, use the day number
+  if (grepl("lectures", file_path)) {
+    day_num <- path_file(path_dir(file_path))
+    return(paste0(day_num, ".html"))
+  }
+  
+  # For examples and postmortems, just use the base name
+  return(paste0(base_name, ".html"))
+}
+
 # Function to compile a single document
 compile_document <- function(file_path, output_dir) {
-  # Get the base name without extension
-  base_name <- basename(file_path)
-  base_name <- sub("\\.qmd$", "", base_name)
+  cli_alert_info("Processing file: {file_path}")
+  cli_alert_info("Output directory: {output_dir}")
   
   # Ensure output directory exists
   ensure_dir(output_dir)
@@ -75,23 +101,73 @@ compile_document <- function(file_path, output_dir) {
   
   cli_alert_info("Compiling {file_path}")
   tryCatch({
-    # Change to the directory containing the file
-    setwd(dirname(file_path))
+    # Change to the appropriate project directory to use its _quarto.yml
+    project_dir <- get_project_dir(file_path)
+    cli_alert_info("Project directory: {project_dir}")
+    setwd(project_dir)
     
     # First clean up any existing temporary files
     cleanup_temp_files(file_path)
     
-    # Render the file using quarto CLI
-    system(sprintf("quarto render %s --to html", basename(file_path)))
+    # Get the base name for the output file
+    base_name <- basename(file_path)
+    base_name <- sub("\\.qmd$", "", base_name)
     
-    # Move the rendered file to the output directory
-    rendered_file <- file.path(dirname(file_path), paste0(base_name, ".html"))
-    if (file_exists(rendered_file)) {
-      file_move(rendered_file, file.path(output_dir, paste0(base_name, ".html")))
+    # For lectures, use the day number
+    if (grepl("lectures", file_path)) {
+      output_name <- paste0(path_file(path_dir(file_path)), ".html")
+      # Look for the rendered file in the nested structure
+      nested_file <- file.path(output_dir, path_file(path_dir(file_path)), paste0(path_file(path_dir(file_path)), "_lecture.html"))
+    } else {
+      # For examples and postmortems, use the base name
+      output_name <- paste0(base_name, ".html")
+      # Look for the rendered file in the same directory as the source
+      nested_file <- file.path(dirname(file_path), paste0(base_name, ".html"))
     }
     
-    # Clean up temporary files after rendering
-    cleanup_temp_files(file_path)
+    target_file <- file.path(output_dir, output_name)
+    
+    cli_alert_info("Looking for rendered file at: {nested_file}")
+    
+    # Render the file using quarto CLI with the appropriate _quarto.yml
+    render_cmd <- sprintf("quarto render %s", file_path)
+    cli_alert_info("Running command: {render_cmd}")
+    system(render_cmd)
+    
+    if (file_exists(nested_file)) {
+      cli_alert_success("Found rendered file at: {nested_file}")
+      
+      # Move the file to the flat structure
+      file_move(nested_file, target_file)
+      cli_alert_success("Moved file to: {target_file}")
+      
+      # Also handle the _files directory
+      if (grepl("lectures", file_path)) {
+        nested_files_dir <- file.path(output_dir, path_file(path_dir(file_path)), paste0(path_file(path_dir(file_path)), "_lecture_files"))
+      } else {
+        nested_files_dir <- file.path(dirname(file_path), paste0(base_name, "_files"))
+      }
+      
+      target_files_dir <- file.path(output_dir, paste0(sub("\\.html$", "", output_name), "_files"))
+      
+      if (dir_exists(nested_files_dir)) {
+        cli_alert_success("Found _files directory at: {nested_files_dir}")
+        # Move the _files directory to the flat structure
+        file_move(nested_files_dir, target_files_dir)
+        cli_alert_success("Moved _files directory to: {target_files_dir}")
+      }
+      
+      # Clean up the empty day directory for lectures
+      if (grepl("lectures", file_path)) {
+        day_dir <- file.path(output_dir, path_file(path_dir(file_path)))
+        if (dir_exists(day_dir)) {
+          dir_delete(day_dir)
+          cli_alert_success("Cleaned up empty directory: {day_dir}")
+        }
+      }
+    } else {
+      cli_alert_danger("Rendered file not found at: {nested_file}")
+    }
     
     cli_alert_success("Successfully compiled {file_path}")
   }, error = function(e) {
@@ -104,11 +180,17 @@ compile_document <- function(file_path, output_dir) {
 
 # Function to compile all files in a directory
 compile_directory <- function(dir_path, output_dir) {
+  cli_alert_info("Compiling directory: {dir_path}")
+  cli_alert_info("Output directory: {output_dir}")
+  
   # Ensure output directory exists
   ensure_dir(output_dir)
   
-  # Get all .qmd files in the directory
+  # Get all .qmd files in the directory, excluding project-example
   qmd_files <- dir_ls(dir_path, glob = "*.qmd", recurse = TRUE)
+  qmd_files <- qmd_files[!grepl("project-example", qmd_files)]
+  
+  cli_alert_info("Found {length(qmd_files)} files to compile")
   
   # Compile each file
   for (file in qmd_files) {

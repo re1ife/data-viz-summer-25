@@ -1,0 +1,41 @@
+---
+title: "AI & LLM Example"
+author: "Erik Westlund"
+date: "2025-06-11"
+date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
+editor:
+  render-on-save: true
+---
+
+## Overview
+
+* We'll use an LLM to help us prepare data for a visualization
+* Let's use the [CDC's data on influenza vaccination coverage for all ages](https://data.cdc.gov/Flu-Vaccinations/Influenza-Vaccination-Coverage-for-All-Ages-6-Mont/vh55-3he6/about_data)
+
+## Data Preparation
+
+```{r setup}
+#| echo: false
+#| message: false
+
+library(dplyr)
+library(ggplot2)
+library(readr)
+```
+
+
+```{r}
+df <- read_csv(here::here("data", "raw", "cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv"))
+
+df |> glimpse()
+```
+
+## Chat with the LLM
+
+From here, we can chat with the LLM to help us prepare the data for a visualization.
+
+```{r}
+
+# Code
+
+```
