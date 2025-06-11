@@ -1,0 +1,62 @@
+---
+title: "Day 2 Postmortem"
+author: "Erik Westlund"
+date: "2025-06-11"
+---
+
+## Video Recording
+
+The video recording [can be viewed by clicking here](https://jhjhm.zoom.us/rec/share/HhTXFk69-XPlbo1TGSyGcYGYCiRsvkiYm9ZwdRrBLGYVQBuoYMA0PUHBR5IRJnui.97NsHCa-dX-oe57m?startTime=1749647293000)
+
+The password has been shared via email and CoursePlus.
+
+## Course Site
+
+There is now a course site at [https://erikwestlund.github.io/data-viz-summer-25/](https://erikwestlund.github.io/data-viz-summer-25/).
+
+This archives the lectures, examples (in final rendered form), and postmortems.
+
+The sources files are still in the GitHub repository in `lectures/`, `examples/`, and `postmortems/`.
+
+The compiled files are in the `docs/` directory (these are the files GitHub pages makes publicly available at the above URL).
+
+## Location of Slides
+
+The slides have been moved from the `slides` directory in the GitHub repository to `docs/slides`.
+
+## Problem Set 2
+
+### Due Date
+
+I have allowed for an extension on the submission of Problem Set 2.
+
+### Assignments
+ 
+Problem Set 2 asks you to create a three-variable visualization, building it up later by layer. This typically means in `ggplot2` you will have:
+
+* Two variables accounted for in the aesthetic mapping. (e.g., `ggplot(data, aes(x = x, y = y))`
+* One other variable handled using `fill`, `facet_wrap`, or another technique.
+
+An example of this approach is provided in the [prams_3_iteration_aggregation.qmd file](https://erikwestlund.github.io/data-viz-summer-25/examples/prams_3_iteration_aggregation.html).
+
+For example, in the example, we account for three variables in this way:
+
+* Two variables accounted for in the aesthetic mapping: `x = subgroup` and `y = depression_within_3_months_birth`
+* A third variable (`location_abbr`) accounted for with `facet_wrap(~ location_abbr)`
+
+The final plot uses three variables as well, even if it appears to use two.  The aggregation done before summarizing variables turns `subgroup` and `depression_within_3_months_birth` into a single variable.
+
+## AI/LLM Illustration
+
+I have updated the AI example with the prompts we used (most of them) and the results of our inquiry.  
+
+You may want to review it in order to see how you can interact with an LLM to work through a data file. Remember:
+
+* You must be cautious with private data, and so this type of workflow is not always appropriate.
+* You should spend more time than we did with data documentation and codebook before jumping in.
+
+I would also note that the more detailed instructions you give the LLM, the better it performs. A tactic I've used with success it to send my prompts to one LLM, ask it to refine it to give to another, and then ask the second LLM to respnod. It tends to provide more context which helps the second LLM perform better.
+
+## Other Examples
+
+Please review the examples we worked through in class. Due to time limitations, we cannot discuss every line of code and every detail.

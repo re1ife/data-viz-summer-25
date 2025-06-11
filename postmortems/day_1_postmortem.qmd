@@ -1,7 +1,7 @@
 ---
 title: "Day 1 Postmortem"
 author: "Erik Westlund"
-date: "2025-06-11"
+date: "2025-06-10"
 ---
 
 ## Video Recording
