@@ -20,7 +20,12 @@ editor:
 
 library(dplyr)
 library(ggplot2)
+library(forcats)
+library(janitor)
 library(readr)
+library(stringr)
+library(tidyr)
+
 ```
 
 
@@ -36,6 +41,88 @@ From here, we can chat with the LLM to help us prepare the data for a visualizat
 
 ```{r}
 
-# Code
+# Clean and prepare
+clean_df <- df |>
+  clean_names() |>
+  mutate(
+    vaccine = factor(vaccine),
+    geography_type = factor(geography_type),
+    geography = factor(geography),
+    season_survey_year = factor(season_survey_year),
+    dimension_type = factor(dimension_type),
+    dimension = factor(dimension),
+     estimate = as.numeric(str_replace(estimate_percent, "[^0-9.]", "")),
+    ci_clean = str_remove(x95_percent_ci_percent, " ‡| †"),
+    ci_lower = as.numeric(str_extract(ci_clean, "^[0-9.]+")),
+    ci_upper = as.numeric(str_extract(ci_clean, "[0-9.]+$"))
+  )
+
+# Preview result
+glimpse(clean_df)
+
+```
+
+```{r summarize}
+dimension_summary <- clean_df |>
+  count(dimension_type, dimension, sort = TRUE) |>
+  arrange(dimension_type, desc(n))
+
+# Display top 10 per type (optional, remove if you want all)
+dimension_summary |>
+  group_by(dimension_type) |>
+  slice_head(n = 10) |>
+  ungroup() |>
+  knitr::kable()
+
+```
+
+```{r}
+mutually_exclusive_ages <- c(
+  "6 Months - 4 Years",
+  "5-12 Years",
+  "13-17 Years",
+  "18-49 Years",
+  "50-64 Years",
+  ">=65 Years"
+)
+
+# Build the cleaned time series dataframe
+age_time_series <- clean_df |>
+  filter(
+    dimension_type == "Age",
+    dimension %in% mutually_exclusive_ages,
+    !is.na(estimate)
+  ) |>
+  group_by(season_survey_year, age_group = dimension) |>
+  summarise(
+    mean_estimate = mean(estimate, na.rm = TRUE),
+    n_records = n(),
+    .groups = "drop"
+  ) |>
+  mutate(
+    age_group = fct_relevel(age_group, mutually_exclusive_ages)
+  )
+
+# View the resulting structure
+glimpse(age_time_series)
+
+```
+
+```{r}
+
+ggplot(age_time_series, aes(x = season_survey_year, y = mean_estimate, group = age_group, color = age_group)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  labs(
+    title = "Influenza Vaccination Coverage Over Time by Age Group",
+    x = "Season/Survey Year",
+    y = "Mean Vaccination Estimate (%)",
+    color = "Age Group"
+  ) +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
 
 ```

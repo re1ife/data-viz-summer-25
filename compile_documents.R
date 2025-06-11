@@ -116,8 +116,8 @@ compile_document <- function(file_path, output_dir) {
     # For lectures, use the day number
     if (grepl("lectures", file_path)) {
       output_name <- paste0(path_file(path_dir(file_path)), ".html")
-      # Look for the rendered file in the nested structure
-      nested_file <- file.path(output_dir, path_file(path_dir(file_path)), paste0(path_file(path_dir(file_path)), "_lecture.html"))
+      # Look for the rendered file in the source directory
+      nested_file <- file.path(dirname(file_path), paste0(path_file(path_dir(file_path)), "_lecture.html"))
     } else {
       # For examples and postmortems, use the base name
       output_name <- paste0(base_name, ".html")
