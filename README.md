@@ -61,7 +61,7 @@ To get started with this using this repository for this course:
 
 Note: If you want to keep your fork up to date with the original repository, you can add it as a remote:
 ```bash
-git remote add upstream https://github.com/original-owner/data-viz-summer-25.git
+git remote add upstream https://github.com/erikwestlund/data-viz-summer-25.git
 git fetch upstream
 git merge upstream/main
 ```
