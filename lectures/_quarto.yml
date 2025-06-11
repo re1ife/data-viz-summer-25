@@ -9,6 +9,7 @@ format:
     footer: "Graduate Summer Institute of Epidemiology and Biostatistics"
     logo: "https://www.jhu.edu/assets/themes/shared/src/assets/images/favicons/favicon-96x96.png"
     self-contained: true
+    embed-resources: true
     css: ../styles.css
 execute:
   echo: true

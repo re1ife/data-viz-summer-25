@@ -108,8 +108,9 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 * Note that we'll be opening the entire course repo as a project, so the root directory is one level up from the `examples` directory
 * We will return to this data file later to visualize it
 
-## Grammar of Graphics
+# The Grammar of Graphics
 
+## `ggplot2` and the Grammar of Graphics
 
 * The "gg" in ggplot2 stands for the grammar of graphics, a concept coined by Leland Wilkinson and popularized by Hadley Wickham.
 * Grammar in language is a set of rules for how language is structured.
@@ -207,7 +208,7 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 :::: {.columns}
 ::: {.column width="50%"}
 * A design system is a set of rules for how to create a consistent visual language
-* If you are really polishing, you might want to use a color design system
+* If you are really polishing a figure, you might want to use a color design system
 * To the right is an example drawn from the `colors.R` file in the `examples` directory, which implements [TailwindCSS's color palette](https://tailwindcss.com/docs/customizing-colors)
 :::
 
@@ -219,7 +220,7 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 ## Example
 
 * In the `examples/colors_example.qmd` file, we will explore the use of color design systems and perceptually uniform colors
-* We will also explore the use of the `viridis` package, which provides perceptually uniform, colorblind-friendly options
+
 
 
 
