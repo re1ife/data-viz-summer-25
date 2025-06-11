@@ -18,7 +18,7 @@ install_if_missing <- function(pkg) {
 }
 
 # Configuration
-RENDERED_DIR <- file.path(here::here(), "rendered")  # Main output directory in project root
+RENDERED_DIR <- file.path(here::here(), "docs")  # Main output directory in project root
 LECTURES_DIR <- file.path(RENDERED_DIR, "slides")  # Lectures are the slides
 EXAMPLES_DIR <- file.path(RENDERED_DIR, "examples")  # Examples output directory
 POSTMORTEMS_DIR <- file.path(RENDERED_DIR, "postmortems")  # Postmortems output directory
