@@ -13,8 +13,7 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 - AI & LLMs: An Illustration
 - Data preparation fundamentals
 - Introduction to the grammar of graphics
-- Basic plot types and their use cases
-- Data transformation for visualization
+- Colors & accessibility
 :::
 
 ## AI & LLMs: An Illustration
@@ -176,12 +175,23 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 * A powerful and frustration-reducing technique is to do the aggregation yourself and then use the `identity` mapping
 * This separates the statistical logic from the visual logic and is often what makes a tricky figure easier to make
 
+
 ## Illustration
 
 * Let's load the `prams_2_ggplot_concepts.qmd` file
 * In this file we will load the data we prepared in the previous file
 * We will then work through the key ggplot2 concepts with examples.
 * We will iterate on the figure to make it more informative and visually appealing
+
+## Aggregation Example
+
+* The PRAMS data we used comes pre-aggregated
+* In `prams_3_aggregation.qmd` we will illustrate how statistical transformations work by showing:
+
+    - The identity transformation with pre-aggregated data
+    - Using aggregations with simulated data
+
+
 
 # Colors & Accessibility
 
@@ -220,7 +230,6 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 ## Example
 
 * In the `examples/colors_example.qmd` file, we will explore the use of color design systems and perceptually uniform colors
-
 
 
 
