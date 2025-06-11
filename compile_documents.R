@@ -1,6 +1,5 @@
 #!/usr/bin/env Rscript
 
-# List of required packages
 required_packages <- c(
   "quarto",
   "fs",    
