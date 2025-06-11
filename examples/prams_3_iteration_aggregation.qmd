@@ -1,0 +1,672 @@
+---
+title: "PRAMS Data Analysis: Iteration, Aggregation, & Transformation"
+author: "Erik Westlund"
+date: "2025-06-11"
+date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
+
+editor:
+  render-on-save: true
+---
+
+```{r setup}
+
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(kableExtra)
+library(readr)
+library(ggtext)
+
+source(here::here("examples", "colors.R"))
+```
+
+## Goal
+
+In this file, we'll show:
+
+* How to iterate on a figure to make it more informative and visually appealing.
+* The difference between using `stat = "identity"` and other statistical transformations.
+
+## Research Question
+
+Let's examine the relationship between depression in the 3 months before birth and the number of previous live births, focusing specifically on Wisconsin.
+
+## Data Preparation
+
+First, let's load and prepare our data:
+
+```{r load-data}
+
+df_final <- readRDS(here::here("data", "processed", "cdc_prams_df_final.rds"))
+
+# Filter for Wisconsin and relevant variables
+df_wi <- df_final |>
+  filter(
+    location_abbr == "WI",
+    subgroup_cat == "Number of Previous Live Births"
+  ) |>
+  select(
+    location_abbr,
+    subgroup,
+    depression_within_3_months_birth
+  )
+
+# Let's look at the structure of our filtered data
+df_wi |>
+  glimpse()
+```
+
+Let's examine the unique values in our key variables:
+
+```{r examine-variables}
+
+# Check unique values in depression variable
+df_wi |>
+  select(depression_within_3_months_birth) |>
+  distinct() |>
+  kable()
+
+# Check unique values in subgroup (number of previous live births)
+df_wi |>
+  select(subgroup) |>
+  distinct() |>
+  kable()
+```
+
+Now let's create our first visualization:
+
+```{r first-plot}
+
+p1 <- df_wi |>
+  ggplot(aes(x = subgroup, y = depression_within_3_months_birth)) +
+  geom_bar(
+    stat = "identity", 
+    fill = colors$blue[['100']],
+    color = colors$blue[['400']],
+    linewidth = 0.5,
+    linetype = "solid"
+  ) +
+  geom_text(
+    aes(label = sprintf("%.1f%%", depression_within_3_months_birth)),
+    vjust = -1.2,
+    size = 3.5
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Depression Before Birth by Number of Previous Live Births",
+    subtitle = "Wisconsin PRAMS Data",
+    x = "Number of Previous Live Births",
+    y = "Percentage Reporting Depression"
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+  )
+
+p1
+```
+
+## Faceting By Small Multiples
+
+A great strategy for showing patterns by groups is to facet by small multiples.
+
+Let's start again with our data, not filtering by Wisconsin, but showing little bar charts for each state.
+
+```{r facet-by-state}
+
+p2 <- df_final |>
+  filter(subgroup_cat == "Number of Previous Live Births") |>
+  ggplot(aes(x = subgroup, y = depression_within_3_months_birth)) +
+  geom_bar(
+    stat = "identity", 
+    fill = colors$blue[['100']],
+    color = colors$blue[['400']],
+    linewidth = 0.5,
+    linetype = "solid"
+  ) +
+  geom_text(
+    aes(label = sprintf("%.1f%%", depression_within_3_months_birth)),
+    vjust = -1.2,
+    size = 3.5
+  ) +
+  facet_wrap(~ location_abbr) +
+  theme_minimal() +
+  labs(
+    title = "Depression Before Birth by Number of Previous Live Births",
+    subtitle = "By State",
+    x = "Number of Previous Live Births",
+    y = "Percentage Reporting Depression"
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    strip.text = element_text(face = "bold")
+  )
+
+p2
+```
+This a start.  it has issues, though.  First, we have a lot of missing states. Let's fix that first.
+
+```{r fix-missing-states}
+
+p3 <- df_final |>
+  filter(subgroup_cat == "Number of Previous Live Births") |>
+  filter(!is.na(depression_within_3_months_birth)) |>
+  ggplot(aes(x = subgroup, y = depression_within_3_months_birth)) +
+  geom_bar(
+    stat = "identity", 
+    fill = colors$blue[['100']],
+    color = colors$blue[['400']],
+    linewidth = 0.5,
+    linetype = "solid"
+  ) +
+  geom_text(
+    aes(label = sprintf("%.1f%%", depression_within_3_months_birth)),
+    vjust = -1.2,
+    size = 3.5
+  ) +
+  facet_wrap(~ location_abbr) +
+  theme_minimal() +
+  labs(
+    title = "Depression Before Birth by Number of Previous Live Births",
+    subtitle = "By State",
+    x = "Number of Previous Live Births",
+    y = "Percentage Reporting Depression"
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    strip.text = element_text(face = "bold")
+  )
+
+p3
+
+
+```
+
+This is an improvement, but we see some issues.  First, our y-axis is too short, and annotations are getting cut off.  We can fix our y axis to go to 20
+
+```{r fix-y-axis}
+
+p4 <- p3 +
+  scale_y_continuous(limits = c(0, 20))
+
+p4
+```
+
+That's better.  Some stylistic adjustments:
+
+* Need more space between the labels and the plot:
+
+
+```{r style-adjustments}
+
+p5 <- p4 +
+  theme(
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10))
+  )
+
+p5
+```
+
+Now, let's sort it by the *difference* between the birth. This requires data transformation, so we'll start from scratch.
+
+```{r sort-by-difference}
+
+# Calculate differences and sort states
+state_diffs <- df_final |>
+  filter(subgroup_cat == "Number of Previous Live Births") |>
+  filter(!is.na(depression_within_3_months_birth)) |>
+  group_by(location_abbr) |>
+  summarize(
+    first_birth = depression_within_3_months_birth[subgroup == "0"],
+    later_births = mean(depression_within_3_months_birth[subgroup != "0"]),
+    diff = first_birth - later_births
+  ) |>
+  arrange(desc(diff))
+
+# Create ordered factor for states
+state_order <- state_diffs$location_abbr
+
+# Create plot with sorted states
+p6 <- df_final |>
+  filter(subgroup_cat == "Number of Previous Live Births") |>
+  filter(!is.na(depression_within_3_months_birth)) |>
+  mutate(location_abbr = factor(location_abbr, levels = state_order)) |>
+  left_join(
+    state_diffs |> select(location_abbr, diff),
+    by = "location_abbr"
+  ) |>
+  ggplot(aes(x = subgroup, y = depression_within_3_months_birth)) +
+  geom_bar(
+    stat = "identity", 
+    aes(fill = diff > 0, color = diff > 0),
+    linewidth = 0.5,
+    linetype = "solid"
+  ) +
+  scale_fill_manual(
+    name = "Difference",
+    values = c(
+      "TRUE" = colors$blue[['100']],
+      "FALSE" = colors$red[['100']]
+    ),
+    labels = c(
+      "TRUE" = "Depression Improves With Extra Births",
+      "FALSE" = "Depression Worsens With Extra Births"
+    )
+  ) +
+  scale_color_manual(
+    name = "Difference",
+    values = c(
+      "TRUE" = colors$blue[['400']],
+      "FALSE" = colors$red[['400']]
+    ),
+    labels = c(
+      "TRUE" = "Depression Improves With Extra Births",
+      "FALSE" = "Depression Worsens With Extra Births"
+    )
+  ) +
+  geom_text(
+    aes(label = sprintf("%.1f%%", depression_within_3_months_birth)),
+    vjust = -1.2,
+    size = 3.5
+  ) +
+  facet_wrap(~ location_abbr) +
+  scale_y_continuous(limits = c(0, 20)) +
+  theme_minimal() +
+  labs(
+    title = "Depression Before Birth by Number of Previous Live Births",
+    subtitle = "States ordered by difference between first birth and subsequent births",
+    x = "Number of Previous Live Births",
+    y = "Percentage Reporting Depression"
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    strip.text = element_text(face = "bold"),
+    axis.title.x = element_text(margin = margin(t = 10)),
+    axis.title.y = element_text(margin = margin(r = 10)),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+
+p6
+```
+
+This is interesting, but I wonder if we're using the right graph.
+
+If we're interested in the *difference*, we can do a forest plot by state in a single plot. Let's start with a basic version.
+
+```{r forest-plot}
+#| message: false
+
+# Calculate differences for forest plot
+forest_data <- df_final |>
+  filter(subgroup_cat == "Number of Previous Live Births") |>
+  filter(!is.na(depression_within_3_months_birth)) |>
+  group_by(location_abbr) |>
+  summarize(
+    first_birth = depression_within_3_months_birth[subgroup == "0"],
+    later_births = mean(depression_within_3_months_birth[subgroup != "0"]),
+    diff = first_birth - later_births
+  ) |>
+  arrange(diff)  # Sort by difference
+
+# Create ordered factor for states
+state_order <- forest_data$location_abbr
+
+# Create forest plot
+p7 <- forest_data |>
+  mutate(location_abbr = factor(location_abbr, levels = state_order)) |>
+  ggplot(aes(x = diff, y = location_abbr)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_segment(
+    aes(
+      x = 0,
+      xend = diff,
+      y = location_abbr,
+      yend = location_abbr,
+      color = diff > 0
+    ),
+    linewidth = 1
+  ) +
+  scale_color_manual(
+    values = c(
+      "TRUE" = colors$blue[['400']],
+      "FALSE" = colors$red[['400']]
+    ),
+    labels = c(
+      "TRUE" = "Depression Improves With Extra Births",
+      "FALSE" = "Depression Worsens With Extra Births"
+    )
+  ) +
+  scale_x_continuous(
+    limits = c(min(forest_data$diff) - 2, max(forest_data$diff) + 2),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Difference in Depression Rates: First Birth vs. Subsequent Births",
+    subtitle = "Positive values indicate higher depression rates for first births",
+    x = "Difference in Depression Rate (First Birth - Subsequent Births)",
+    y = NULL
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+
+p7
+```
+
+This is a decent start.  Let's add text annotations to the plot. Let's also use the `location` rather than the abbrevaition.
+
+```{r add-text-annotations}
+#| message: false
+
+# Calculate differences for forest plot
+forest_data <- df_final |>
+  filter(subgroup_cat == "Number of Previous Live Births") |>
+  filter(!is.na(depression_within_3_months_birth)) |>
+  group_by(location_abbr, location) |>
+  summarize(
+    first_birth = depression_within_3_months_birth[subgroup == "0"],
+    later_births = mean(depression_within_3_months_birth[subgroup != "0"]),
+    diff = first_birth - later_births,
+    .groups = "drop"
+  ) |>
+  arrange(diff)  # Sort by difference
+
+# Create ordered factor for states
+state_order <- forest_data$location
+
+# Create forest plot
+p8 <- forest_data |>
+  mutate(location = factor(location, levels = state_order)) |>
+  ggplot(aes(x = diff, y = location)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_segment(
+    aes(
+      x = 0,
+      xend = diff,
+      y = location,
+      yend = location,
+      color = diff > 0
+    ),
+    linewidth = 1
+  ) +
+  geom_text(
+    aes(
+      x = diff,
+      label = sprintf("%+.1f%%", diff)
+    ),
+    hjust = ifelse(forest_data$diff > 0, -0.3, 1.3),
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  scale_color_manual(
+    values = c(
+      "TRUE" = colors$blue[['400']],
+      "FALSE" = colors$red[['400']]
+    ),
+    labels = c(
+      "TRUE" = "Depression Improves With Extra Births",
+      "FALSE" = "Depression Worsens With Extra Births"
+    )
+  ) +
+  scale_x_continuous(
+    limits = c(min(forest_data$diff) - 2, max(forest_data$diff) + 2),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Difference in Depression Rates: First Birth vs. Subsequent Births",
+    subtitle = "Positive values indicate higher depression rates for first births",
+    x = "Difference in Depression Rate (First Birth - Subsequent Births)",
+    y = NULL
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+
+p8
+```
+
+The spacing is a little wide between the annotations. Let's also make them bold.
+
+```{r forest-plot-style}
+#| message: false
+
+p9 <- forest_data |>
+  mutate(location = factor(location, levels = state_order)) |>
+  ggplot(aes(x = diff, y = location)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_segment(
+    aes(
+      x = 0,
+      xend = diff,
+      y = location,
+      yend = location,
+      color = diff > 0
+    ),
+    linewidth = 1
+  ) +
+  geom_text(
+    aes(
+      x = diff,
+      label = sprintf("%+.1f%%", diff)
+    ),
+    hjust = ifelse(forest_data$diff > 0, -0.3, 1.3),
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  scale_color_manual(
+    values = c(
+      "TRUE" = colors$blue[['400']],
+      "FALSE" = colors$red[['400']]
+    ),
+    labels = c(
+      "TRUE" = "Depression Improves With Extra Births",
+      "FALSE" = "Depression Worsens With Extra Births"
+    )
+  ) +
+  scale_x_continuous(
+    limits = c(min(forest_data$diff) - 2, max(forest_data$diff) + 2),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Difference in Depression Rates: First Birth vs. Subsequent Births",
+    subtitle = "Positive values indicate higher depression rates for first births",
+    x = "Difference in Depression Rate (First Birth - Subsequent Births)",
+    y = NULL
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_blank()
+  )
+
+p9
+```
+
+Let's step back and think.
+
+* The subtitle does the work of the caption. We can remove it and simplify the code.  
+* The bold is too much.  Let's remove it.
+* We need more top margin on our y axis.
+
+```{r readjust-plot}
+#| fig.height: 5
+
+p10 <- forest_data |>
+  mutate(location = factor(location, levels = state_order)) |>
+  ggplot(aes(x = diff, y = location)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+  geom_segment(
+    aes(
+      x = 0,
+      xend = diff,
+      y = location,
+      yend = location,
+      color = ifelse(diff > 0, "positive", "negative")
+    ),
+    linewidth = 1
+  ) +
+  geom_text(
+    aes(
+      x = diff,
+      label = sprintf("%+.1f%%", diff)
+    ),
+    hjust = ifelse(forest_data$diff > 0, -0.3, 1.3),
+    size = 3.5
+  ) +
+  scale_color_manual(
+    values = c(
+      "positive" = colors$blue[['400']],
+      "negative" = colors$red[['400']]
+    )
+  ) +
+  scale_x_continuous(
+    limits = c(min(forest_data$diff) - 2, max(forest_data$diff) + 2),
+    breaks = seq(-10, 10, 2)
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Difference in Depression Rates: First Birth vs. Subsequent Births",
+    subtitle = "Positive values indicate higher depression rates for first births",
+    x = "Difference in Depression Rate (First Birth - Subsequent Births)",
+    y = NULL
+  ) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    legend.position = "none",
+    axis.text.y = element_text(margin = margin(r = 10))
+  )
+
+p10
+```
+
+## Thinking About Aggregations & Transformations
+
+Let's create a simulated dataset to illustrate how we were using `stat = "identity"` above. We'll create individual-level data that mimics our PRAMS data structure.
+
+```{r simulate-data}
+# Set seed for reproducibility
+set.seed(123)
+
+# Create simulated data
+sim_data <- tibble(
+  state = rep(state.name, each = 100)  # 100 people per state
+) |>
+  mutate(
+    person_id = row_number(),  # Generate unique IDs
+    # Generate number of previous births using Poisson distribution (mean = 1)
+    previous_births_count = rpois(n(), lambda = 1),
+    # Create factor for 0 vs 1+ births
+    previous_births = factor(
+      ifelse(previous_births_count == 0, "0", "1+"),
+      levels = c("0", "1+")
+    ),
+    
+    # Generate depression status with different probabilities based on previous births
+    # Higher probability of depression for first births (0) than subsequent births (1+)
+    depression_prob = ifelse(previous_births == "0", 0.15, 0.10),  # 15% vs 10% base rates
+    depression = rbinom(n(), 1, depression_prob) == 1  # Convert to TRUE/FALSE
+  ) |> 
+  select(-depression_prob)
+
+# Let's look at the structure
+sim_data |>
+  glimpse()
+
+sim_data |>
+  head() |>
+  kable()
+
+# Quick summary to verify our data
+sim_data |>
+  group_by(state, previous_births) |>
+  summarize(
+    n = n(),
+    depression_rate = mean(depression) * 100,
+    .groups = "drop"
+  ) |>
+  head() |>
+  kable()
+```
+
+
+## Recreating Visualizations with Simulated Data
+
+Let's recreate our visualizations using the simulated data, starting with Wisconsin.
+
+Below we are using the `stat = "summary"` to aggregate the data and the `scales` functionality to format the y axis as a percentage.
+
+```{r wisconsin-bar-chart}
+# Filter for Wisconsin
+wi_data <- sim_data |>
+  filter(state == "Wisconsin") |>
+  mutate(depression = as.numeric(depression))
+
+# Approach 1: Using scales::percent_format()
+p1_sim <- wi_data |>
+  ggplot(aes(x = previous_births, y = depression)) +
+  geom_bar(
+    stat = "summary",  # We let ggplot2 do the aggregation for us
+    fun = "mean"
+  ) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal() +
+  labs(
+    title = "Depression Before Birth by Number of Previous Live Births",
+    x = "Number of Previous Live Births",
+    y = "Percentage Reporting Depression"
+  )
+
+p1_sim
+```
+
+An alternative approach is -- similar to above -- is to do the aggregation ourselves and use identity.
+
+```{r wisconsin-bar-chart-2}
+
+
+# Approach 2: Multiplying by 100 in the aggregation
+p1_sim_self_aggregate <- wi_data |>
+  group_by(previous_births) |>
+  summarize(
+    depression_rate = mean(depression) * 100,  # Convert to percentage
+    .groups = "drop"
+  ) |>
+  ggplot(aes(x = previous_births, y = depression_rate)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(
+    title = "Depression Before Birth by Number of Previous Live Births",
+    x = "Number of Previous Live Births",
+    y = "Percentage Reporting Depression"
+  )
+
+# Display both plots
+
+p1_sim_self_aggregate
+```
+
+Life tends to be easier when you summarize the data yourself.  I find it more explicit and it avoids confusion from trying to figure out exactly what `ggplot2` is doing.

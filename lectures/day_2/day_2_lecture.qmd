@@ -175,23 +175,24 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 * A powerful and frustration-reducing technique is to do the aggregation yourself and then use the `identity` mapping
 * This separates the statistical logic from the visual logic and is often what makes a tricky figure easier to make
 
+# Examples
 
-## Illustration
+## Illustration: `ggplot2` Concepts
 
 * Let's load the `prams_2_ggplot_concepts.qmd` file
 * In this file we will load the data we prepared in the previous file
 * We will then work through the key ggplot2 concepts with examples.
 * We will iterate on the figure to make it more informative and visually appealing
 
-## Aggregation Example
+## Illustration: Iteration & Aggregation
 
 * The PRAMS data we used comes pre-aggregated
-* In `prams_3_aggregation.qmd` we will illustrate how statistical transformations work by showing:
+* In `prams_3_iteration_aggregation.qmd` we will illustrate how statistical transformations work by showing:
 
     - The identity transformation with pre-aggregated data
     - Using aggregations with simulated data
 
-
+We will also demonstrate the process of iterating on a figure to make it more informative and visually appealing.
 
 # Colors & Accessibility
 
