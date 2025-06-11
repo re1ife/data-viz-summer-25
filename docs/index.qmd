@@ -1,0 +1,73 @@
+---
+title: "Data Visualization Course Materials"
+format: html
+---
+
+# Course Materials
+
+## Lectures
+
+```{r}
+#| echo: false
+
+# Function to format link text
+format_link_text <- function(text) {
+  # Special cases to handle first
+  special_cases <- list(
+    "ai" = "AI",
+    "llm" = "LLM",
+    "ggplot" = "ggplot"
+  )
+  
+  # Split by underscores
+  words <- strsplit(text, "_")[[1]]
+  
+  # Process each word
+  words <- sapply(words, function(word) {
+    # Check if it's a special case
+    if (tolower(word) %in% names(special_cases)) {
+      return(special_cases[[tolower(word)]])
+    }
+    # Otherwise capitalize
+    return(tools::toTitleCase(word))
+  })
+  
+  # Join with spaces
+  return(paste(words, collapse = " "))
+}
+
+# Function to get all HTML files in a directory
+get_html_files <- function(dir, link_dir) {
+  files <- list.files(dir, pattern = "\\.html$", full.names = TRUE)
+  # Sort by filename
+  files <- sort(files)
+  # Get just the filenames without path and extension
+  names <- sub("\\.html$", "", basename(files))
+  # Format the link text
+  display_names <- sapply(names, format_link_text)
+  # Create links with the correct directory
+  links <- sprintf("- [%s](%s)", display_names, file.path(link_dir, basename(files)))
+  return(paste(links, collapse = "\n"))
+}
+
+# Get and display lecture links
+knitr::asis_output(get_html_files("slides", "slides"))
+```
+
+## Examples
+
+```{r}
+#| echo: false
+
+# Get and display example links
+knitr::asis_output(get_html_files("examples", "examples"))
+```
+
+## Postmortems
+
+```{r}
+#| echo: false
+
+# Get and display postmortem links
+knitr::asis_output(get_html_files("postmortems", "postmortems"))
+```

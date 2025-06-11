@@ -219,6 +219,19 @@ compile_directory(here("examples"), EXAMPLES_DIR)
 cli_h2("Compiling Postmortems")
 compile_directory(here("postmortems"), POSTMORTEMS_DIR)
 
+# Render the index file
+cli_h2("Rendering Index")
+index_file <- here("docs", "index.qmd")
+if (file_exists(index_file)) {
+  cli_alert_info("Rendering index file: {index_file}")
+  setwd(here("docs"))  # Change to docs directory to use its _quarto.yml
+  system("quarto render index.qmd")
+  setwd(here())  # Return to project root
+  cli_alert_success("Index file rendered successfully")
+} else {
+  cli_alert_danger("Index file not found at: {index_file}")
+}
+
 cli_h1("Compilation Complete")
 cli_alert_info("All documents have been compiled to their respective directories:")
 cli_bullets(c(

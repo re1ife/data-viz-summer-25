@@ -9,37 +9,4 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 
 ## Overview
 
-::: {.incremental}
-- Advanced plot customization
-- Color theory and accessibility
-- Interactive visualizations
-- Dashboard design principles
-:::
-
-## Advanced Customization
-
-* Themes and styling
-* Annotations and labels
-* Custom scales and transformations
-* Multi-panel plots
-
-## Color and Accessibility
-
-* Color theory basics
-* Color blindness considerations
-* Contrast and readability
-* Color palettes for data visualization
-
-## Interactive Elements
-
-* Introduction to interactive plots
-* Hover effects and tooltips
-* Zooming and panning
-* Dynamic filtering
-
-## Dashboard Design
-
-* Layout principles
-* Information hierarchy
-* User interaction patterns
-* Responsive design considerations 
+* Coming soon!
