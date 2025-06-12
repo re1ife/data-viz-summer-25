@@ -18,6 +18,8 @@ required_packages <- c(
   "tidyr",
   "here",
   "patchwork",
+  "broom",
+  "kableExtra",
   "viridis",
   "RColorBrewer"
 )
@@ -236,11 +238,15 @@ ggplot(patient_data, aes(x = hospital, y = readmission_rate)) +
 ```
 
 
-## Naughty Axes
+## Naughty (?) Axes
 
 This section demonstrates how axis scaling can be used to mislead viewers about the magnitude of differences between groups in health outcomes. We'll use a simulated dataset of treatment effects on adverse events.
 
 The key technique here is truncating the y-axis to start above zero, which makes small differences appear much larger than they actually are. This is particularly effective when the actual differences are very small percentages.
+
+In the below code, we simulate data of a rare adverse event that occurs in 0.001% of patients.  This adverse event is in reality 3x more likely in the treatment group.
+
+We use a logistic regression to estimate the treatment effect on the adverse event. We then plot the risk of the adverse event by treatment and age group.
 
 ```{r naughty_axes}
 #| message: false
@@ -249,23 +255,30 @@ The key technique here is truncating the y-axis to start above zero, which makes
 # Force regular decimal notation
 options(scipen=999)
 
-n <- 500000
+set.seed(456)
+n <- 1000000
 
 data <- data.frame(
-  treatment = rbinom(n, 1, 0.5),  # 1 = new treatment, 0 = standard care
-  age_group = rbinom(n, 1, 0.5)   # 1 = older adults, 0 = younger adults
+  treatment = rbinom(n, 1, 0.5)  # 1 = new treatment, 0 = standard care
 )
 
-base_prob <- 0.000001 # 0.0001% baseline risk
+base_prob <- 0.00001 # 0.001% baseline risk 
 
 data$adverse_event <- rbinom(
-  n, 1, base_prob * (1 + 3 * data$treatment + 2 * data$age_group)
+  n, 1, ifelse(data$treatment == 1, base_prob * 3, base_prob)
 )
 
 model <- glm(adverse_event ~ treatment, data = data, family = "binomial")
-summary(model)
+model |> tidy(exponentiate = TRUE) |> kable()
 
-summary_data <- data |>
+```
+
+Below, we visualize the risk of the adverse event by treatment.  We can see the risk of an adverse event is 3x higher in the treatment group, which may be alarming. But note the constrained y-axis.
+
+```{r}
+#| message: false
+
+ summary_data <- data |>
   group_by(treatment) |>
   summarize(
     risk = mean(adverse_event),
@@ -276,11 +289,6 @@ summary_data <- data |>
 # Plot with constrained axes
 ggplot(summary_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
   geom_col(width = 0.7) +
-  geom_text(
-    aes(label = paste0("p = ", sprintf("%.6f", risk))),
-    vjust = -0.5,
-    size = 3
-  ) +
   scale_fill_brewer(palette = "Set2", labels = c("Standard Care", "New Treatment")) +
   labs(
     title = "Risk of Adverse Event by Treatment",
@@ -290,45 +298,14 @@ ggplot(summary_data, aes(x = factor(treatment), y = risk, fill = factor(treatmen
   ) +
   scale_y_continuous(limits = c(0, max(summary_data$risk) * 1.5)) +
   theme_minimal()
+```
 
+However, if we scale the axis to 0-1, we can see that the absolute risk is vanishingly rare.
+
+```{r}
 # Now add age group stratification
-stratified_data <- data |>
-  group_by(age_group, treatment) |>
-  summarize(
-    risk = mean(adverse_event),
-    n = n(),
-    .groups = "drop"
-  )
-
-# Plot with constrained y-axis
-ggplot(stratified_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
-  geom_col(width = 0.7) +
-  geom_text(
-    aes(label = paste0("p = ", sprintf("%.6f", risk))),
-    vjust = -0.5,
-    size = 3
-  ) +
-  scale_fill_brewer(palette = "Set2", labels = c("Standard Care", "New Treatment")) +
-  facet_wrap(~ age_group, nrow = 1, 
-             labeller = labeller(age_group = c(`0` = "Younger Adults", `1` = "Older Adults"))) +
-  labs(
-    title = "Risk of Adverse Event by Treatment and Age Group",
-    subtitle = "Y-axis truncated to emphasize differences",
-    x = "Treatment",
-    y = "Probability of Adverse Event",
-    fill = "Treatment"
-  ) +
-  scale_y_continuous(limits = c(0, max(stratified_data$risk) * 1.5)) +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
-    plot.subtitle = element_text(hjust = 0.5, size = 10),
-    axis.title = element_text(size = 12),
-    strip.text = element_text(size = 11, face = "bold")
-  )
-
 # Plot with full scale
-ggplot(stratified_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
+ggplot(summary_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
   geom_col(width = 0.7) +
   geom_text(
     aes(label = paste0("p = ", sprintf("%.6f", risk))),
@@ -336,11 +313,9 @@ ggplot(stratified_data, aes(x = factor(treatment), y = risk, fill = factor(treat
     size = 3
   ) +
   scale_fill_brewer(palette = "Set2", labels = c("Standard Care", "New Treatment")) +
-  facet_wrap(~ age_group, nrow = 1, 
-             labeller = labeller(age_group = c(`0` = "Younger Adults", `1` = "Older Adults"))) +
   labs(
-    title = "Risk of Adverse Event by Treatment and Age Group",
-    subtitle = "Full scale (0 to 1) showing true magnitude of differences",
+    title = "Risk of Adverse Event by Treatment",
+    subtitle = "Full scale (0 to 1) showing absolute risk",
     x = "Treatment",
     y = "Probability of Adverse Event",
     fill = "Treatment"
@@ -354,6 +329,8 @@ ggplot(stratified_data, aes(x = factor(treatment), y = risk, fill = factor(treat
     strip.text = element_text(size = 11, face = "bold")
   )
 ```
+
+I do not believe that the plot with constrained axes is inherently misleading for certain audiences. For example, those who are familiar with medical research will likely understand that an odds ratio of "3" does mean 3x higher odds of the adverse event, but it does not mean that this is necessarily something the public needs to worry about.  It is important to consider how an audience will interpret the plot.
 
 ## Naughty Time Series Axes
 
