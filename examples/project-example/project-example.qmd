@@ -1,0 +1,40 @@
+---
+title: "Project Example"
+author: "Erik Westlund"
+date: "2025-06-07"
+date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
+format: 
+  html:
+    toc: true
+    toc-float: true
+    toc-depth: 4
+    theme: cosmo
+    self-contained: true
+execute:
+  echo: true
+  warning: false
+  message: false
+  error: false
+  cache: false
+---
+
+```{r init}
+#| echo: false
+
+library(dplyr)
+library(ggplot2)
+```
+
+## Headings
+
+Text
+
+### Subheadings
+
+More Text
+
+### Code Block
+
+```{r example-code}
+mtcars |> head()
+```

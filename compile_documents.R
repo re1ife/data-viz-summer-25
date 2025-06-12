@@ -190,6 +190,9 @@ compile_directory <- function(dir_path, output_dir) {
   qmd_files <- dir_ls(dir_path, glob = "*.qmd", recurse = TRUE)
   qmd_files <- qmd_files[!grepl("project-example", qmd_files)]
   
+  # Exclude the examples/project-example directory
+  qmd_files <- qmd_files[!grepl("examples/project-example", qmd_files)]
+  
   cli_alert_info("Found {length(qmd_files)} files to compile")
   
   # Compile each file
