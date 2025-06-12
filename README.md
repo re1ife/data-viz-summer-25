@@ -84,6 +84,21 @@ If you get prompted with a screen full of changes in the `vim` editor, you can t
 - If you need to experiment or try things out, use the `scratch/` directory (it's gitignored)
 - If you modify files outside the `work/` directory, you may encounter merge conflicts when trying to pull updates from the original repository.
 
+## Data
+
+The repository contains two main data directories:
+
+- `data/raw/`: Contains the original, unmodified data files used in the course
+- `data/processed/`: Contains processed and cleaned versions of the data, ready for analysis
+
+### PRAMS Data
+
+The Pregnancy Risk Assessment Monitoring System (PRAMS) data used in the examples on Day 2 is not included in the repository due to its large size (150MB+). However, you can download it directly from the CDC's data portal:
+
+[CDC PRAMStat Data for 2011](https://data.cdc.gov/Maternal-Child-Health/CDC-PRAMStat-Data-for-2011/ese6-rqpq/about_data)
+
+This dataset contains state-level maternal health data from 2011, including information about maternal behaviors and experiences before, during, and after pregnancy. It is used in the a
+
 ## Credits
 
 * A major debt is owed to Kieran Healy for his [Data Visualization book](https://socviz.co/).
