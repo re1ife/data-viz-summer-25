@@ -18,6 +18,13 @@ editor:
 #| echo: false
 #| message: false
 
+# Install required packages if not already installed
+required_packages <- c("dplyr", "ggplot2", "forcats", "janitor", "kableExtra", 
+                      "readr", "stringr", "tidyr")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load required packages
 library(dplyr)
 library(ggplot2)
 library(forcats)
@@ -29,6 +36,12 @@ library(tidyr)
 
 ```
 
+## Overview
+
+* We'll use an LLM to help us prepare data for a visualization
+* Let's use the [CDC's data on influenza vaccination coverage for all ages](https://data.cdc.gov/Flu-Vaccinations/Influenza-Vaccination-Coverage-for-All-Ages-6-Mont/vh55-3he6/about_data)
+
+## Data Preparation
 
 ```{r}
 #| message: false
@@ -44,100 +57,36 @@ df |> glimpse()
 
 From here, we can chat with the LLM to help us prepare the data for a visualization.
 
-[Below I provide key aspects of the prompt's sent to the ChatGPT LLM as well as the results. I've excluded some of the LLM's missteps.]
+Below I provide key aspects of the prompts sent to the ChatGPT LLM as well as the results. I've excluded some of the LLM's missteps.
 
+### Initial Data Exploration
 
+I am working with an unfamiliar data set. Here is a glimpse using dplyr:
 
-```{markdown}
-I am working with an unfamiliar data set
-
-Here is a glimpse using dplyr
-
-what do you see
-
-> df <- read_csv(here::here("data", "raw", "cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv"))
-Rows: 220729 Columns: 11                                                                                                                                                                               
-── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (9): Vaccine, Geography Type, Geography, FIPS, Season/Survey Year, Dimension Type, Dimension, Estimate (%), 95% CI (%)
-dbl (2): Month, Sample Size
-
-ℹ Use spec() to retrieve the full column specification for this data.
-ℹ Specify the column types or set show_col_types = FALSE to quiet this message.
-> 
-> df |> glimpse()
+```{r}
+df <- read_csv(here::here("data", "raw", "cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv"))
+df |> glimpse()
 ```
 
 The bot then summarized the data set.
 
-Using the following prompt, We then sent the LLM the actual data file for more context (🚨 do not do this with private data! 🚨)
+Using the following prompt, we then sent the LLM the actual data file for more context (🚨 do not do this with private data! 🚨):
 
-```{markdown}
-I am actually going to give you the file.  Interpret it. We are going to use dplyr and ggplot2 to prepare it and visualize aspects of it.
-
-tell me what you see
-```
+"I am actually going to give you the file. Interpret it. We are going to use dplyr and ggplot2 to prepare it and visualize aspects of it. Tell me what you see."
 
 It responded with a summary, warning us about some of the odd structures of the data.
 
 We then asked it to clean the data:
 
-```{markdown}
-Yes, let's get clean, standardized column names. Let's make all factor variables factor types. Lets extract the confidence intervals into separate columns.  Let's just start there. Give me R code that I can paste into RStudio.
-```
+"Yes, let's get clean, standardized column names. Let's make all factor variables factor types. Let's extract the confidence intervals into separate columns. Let's just start there. Give me R code that I can paste into RStudio."
 
 Please note from here on out, ChatGPT gave us code that includes library calls and new code. The library calls are loaded above.
 
 It first gave us back broken code because it did not understand fully the results of applying `clean_names()` to the data.
 
-We eventually sent it the following, explanining the data structure, after which it recovered:
-
-```{markdown}
-It wasn't working, so I did this (removed columns that broke the code)
-
-# Clean and prepare
-clean_df <- df |>
-  clean_names() |>
-  mutate(
-    vaccine = factor(vaccine),
-    geography_type = factor(geography_type),
-    geography = factor(geography),
-    season_survey_year = factor(season_survey_year),
-    dimension_type = factor(dimension_type),
-    dimension = factor(dimension)
-  )
-
-# Preview result
-glimpse(clean_df)
-
-and got back:
-
-> glimpse(clean_df)
-Rows: 220,729
-Columns: 11
-$ vaccine                <fct> "Seasonal Influenza", "Seasonal Influenza", "Seasonal Influenza", "Seasonal Influenza", "Seasonal Influenza", "Seasonal Influenza", "…
-$ geography_type         <fct> Counties, Counties, Counties, Counties, Counties, Counties, States/Local Areas, States/Local Areas, States/Local Areas, States/Local …
-$ geography              <fct> New Haven, New Haven, New Haven, New Haven, New Haven, New Haven, New Jersey, New Jersey, New Jersey, New Jersey, New Jersey, New Jer…
-$ fips                   <chr> "09009", "09009", "09009", "09009", "09009", "09009", "34", "34", "34", "34", "34", "34", "34", "34", "34", "34", "34", "34", "34", "…
-$ season_survey_year     <fct> 2018, 2021, 2020, 2021, 2018, 2019, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10…
-$ month                  <dbl> 1, 1, 1, 1, 1, 1, 5, 4, 11, 10, 9, 8, 9, 1, 12, 11, 10, 3, 2, 5, 4, 3, 2, 1, 12, 5, 5, 4, 3, 2, 12, 5, 8, 4, 3, 2, 1, 12, 11, 10, 9, …
-$ dimension_type         <fct> >=18 Years, >=18 Years, Age, Age, Age, Age, Race and Ethnicity, Race and Ethnicity, Race and Ethnicity, Race and Ethnicity, Race and …
-$ dimension              <fct> "Non-Medical Setting", "Non-Medical Setting", ">=18 Years", ">=18 Years", ">=18 Years", ">=18 Years", "American Indian or Alaska Nati…
-$ estimate_percent       <chr> "45.5", "53.0", "52.4", "50.2", "34.0", "49.5", "57.7", "57.7", "34.7", "24.8", "10.8", "NR †", "NR †", "57.7", "54.8", "44.4", "NR †…
-$ x95_percent_ci_percent <chr> "43.9 to 47.2", "46.0 to 60.9", "50.6 to 54.3", "45.4 to 55.8", "32.6 to 35.5", "47.8 to 51.3", "40.2 to 75.2 ‡", "40.2 to 75.2 ‡", "…
-$ sample_size            <dbl> NA, NA, NA, NA, NA, NA, 48, 48, 552, 552, 552, 552, 48, 48, 48, 48, 48, 48, 48, 2554, 2554, 2554, 2554, 2554, 2554, 8306, 3107, 3107,…
-> 
-
-try again
-```
-
-This context helped if finds its way and we ended up with the following code block:
-
+We eventually sent it the following, explaining the data structure, after which it recovered:
 
 ```{r}
-#| message: false
-#| warning: false
-
 # Clean and prepare
 clean_df <- df |>
   clean_names() |>
@@ -148,7 +97,7 @@ clean_df <- df |>
     season_survey_year = factor(season_survey_year),
     dimension_type = factor(dimension_type),
     dimension = factor(dimension),
-     estimate = as.numeric(str_replace(estimate_percent, "[^0-9.]", "")),
+    estimate = as.numeric(str_replace(estimate_percent, "[^0-9.]", "")),
     ci_clean = str_remove(x95_percent_ci_percent, " ‡| †"),
     ci_lower = as.numeric(str_extract(ci_clean, "^[0-9.]+")),
     ci_upper = as.numeric(str_extract(ci_clean, "[0-9.]+$"))
@@ -156,160 +105,32 @@ clean_df <- df |>
 
 # Preview result
 glimpse(clean_df)
-
 ```
 
 ### Data Summary
 
-We then sent it this to inform it of the structure of the data, which is somewhat unusual.
+We then sent it this to inform it of the structure of the data, which is somewhat unusual:
 
-```{markdown}
-> table(clean_df$dimension)
-
-                                             >=18 Years                                              >=6 Months 
-                                                  26534                                                   10449 
-                                             >=65 Years                                             13-17 Years 
-                                                  10903                                                   10265 
-                                            18-49 Years                                18-49 Years at High Risk 
-                                                   9931                                                   11038 
-                           18-49 Years not at High Risk                                             18-64 Years 
-                                                   9257                                                    9942 
-                               18-64 Years at High Risk                            18-64 Years not at High Risk 
-                                                   9898                                                    8018 
-                               25-64 Years at High Risk                 25-64 Years not in Initial Target Group 
-                                                    496                                                     496 
-                                             5-12 Years                                             50-64 Years 
-                                                  10279                                                   11125 
-                                    6 Months - 17 Years                                      6 Months - 4 Years 
-                                                  12018                                                   10282 
-6 Months - 64 Years at High Risk (Initial Target Group)          American Indian or Alaska Native, Non-Hispanic 
-                                                    496                                                    1702 
-                                    Asian, Non-Hispanic                                     Black, Non-Hispanic 
-                                                   1712                                                   11067 
-                                             Greater 65                               Greater than 18 Years flu 
-                                                    770                                                     770 
-                              Greater than 6 Months flu                                                Hispanic 
-                                                    682                                                   11106 
-                                        Medical Setting                                     Non-Medical Setting 
-                                                    770                                                    6975 
-                  Other or Multiple Races, Non-Hispanic                                          Pharmacy/Store 
-                                                  11093                                                     770 
-                                                 School                                     White, Non-Hispanic 
-                                                    198                                                   11115 
-                                              Workplace 
-                                                    572 
-> table(clean_df$dimension_type)
-
-         >=18 Years          >=65 Years         18-49 Years         18-64 Years         50-64 Years 6 Months - 17 Years                 Age  Race and Ethnicity 
-               6829                 416                 416                 416                 416                 792              163649               47795 
-
-I tabulated the dimensions, and this is what you get.   Can you give me summarize code to make more sense of this that i can put in a notebook?
-
+```{r}
+table(clean_df$dimension)
+table(clean_df$dimension_type)
 ```
 
-It returned us the following:
+Here is what we have:
 
-```{r summarize_dimensions}
-dimension_type_summary <- clean_df %>% 
-  count(dimension_type, name = "n") %>%                       # tally rows
-  arrange(desc(n)) %>%                                        # largest first
-  mutate(percent_of_total = n / sum(n))                       # share of entire data set
+Please notice that the age categories have overlap, so it's clear that these data are pre-aggregated, and we'll want to make sure we use mutually exclusive categories.
 
-## 2 ── full breakdown: every dimension within each type -----------------------
-dimension_breakdown <- clean_df %>% 
-  count(dimension_type, dimension, name = "n") %>%            # tally rows
-  group_by(dimension_type) %>% 
-  mutate(
-    percent_within_type = n / sum(n),                         # share inside the parent type
-    rank_within_type   = dense_rank(desc(n))                  # rank for convenience
-  ) %>% 
-  arrange(dimension_type, desc(n)) %>% 
-  ungroup()
+Here is what we want:
 
-## (optional) keep only the 5 largest dimensions per type ----------------------
-top5_breakdown <- dimension_breakdown %>% 
-  filter(rank_within_type <= 5) %>% 
-  select(-rank_within_type)                                   # drop helper column
+We want to create a time series that shows the vaccination rate, by age, over time.
 
-## ── Quick display ------------------------------------------------------------
-dimension_type_summary %>% 
-  kable(digits = 2, caption = "Records by dimension_type")
-
-top5_breakdown %>% 
-  kable(digits = 2, caption = "Top-5 dimensions within each dimension_type")
-```
-
-I then gave if this response:
-
-```{markdown}
-> # Display top 10 per type (optional, remove if you want all)
-> dimension_summary |>
-+   group_by(dimension_type) |>
-+   slice_head(n = 10) |>
-+   ungroup() |>
-+   knitr::kable()
-
-|dimension_type      |dimension                                      |     n|
-|:-------------------|:----------------------------------------------|-----:|
-|>=18 Years          |Non-Medical Setting                            |  6361|
-|>=18 Years          |Medical Setting                                |   156|
-|>=18 Years          |Pharmacy/Store                                 |   156|
-|>=18 Years          |Workplace                                      |   156|
-|>=65 Years          |Medical Setting                                |   104|
-|>=65 Years          |Non-Medical Setting                            |   104|
-|>=65 Years          |Pharmacy/Store                                 |   104|
-|>=65 Years          |Workplace                                      |   104|
-|18-49 Years         |Medical Setting                                |   104|
-|18-49 Years         |Non-Medical Setting                            |   104|
-|18-49 Years         |Pharmacy/Store                                 |   104|
-|18-49 Years         |Workplace                                      |   104|
-|18-64 Years         |Medical Setting                                |   104|
-|18-64 Years         |Non-Medical Setting                            |   104|
-|18-64 Years         |Pharmacy/Store                                 |   104|
-|18-64 Years         |Workplace                                      |   104|
-|50-64 Years         |Medical Setting                                |   104|
-|50-64 Years         |Non-Medical Setting                            |   104|
-|50-64 Years         |Pharmacy/Store                                 |   104|
-|50-64 Years         |Workplace                                      |   104|
-|6 Months - 17 Years |Medical Setting                                |   198|
-|6 Months - 17 Years |Non-Medical Setting                            |   198|
-|6 Months - 17 Years |Pharmacy/Store                                 |   198|
-|6 Months - 17 Years |School                                         |   198|
-|Age                 |>=18 Years                                     | 26534|
-|Age                 |6 Months - 17 Years                            | 12018|
-|Age                 |50-64 Years                                    | 11125|
-|Age                 |18-49 Years at High Risk                       | 11038|
-|Age                 |>=65 Years                                     | 10903|
-|Age                 |>=6 Months                                     | 10449|
-|Age                 |6 Months - 4 Years                             | 10282|
-|Age                 |5-12 Years                                     | 10279|
-|Age                 |13-17 Years                                    | 10265|
-|Age                 |18-64 Years                                    |  9942|
-|Race and Ethnicity  |White, Non-Hispanic                            | 11115|
-|Race and Ethnicity  |Hispanic                                       | 11106|
-|Race and Ethnicity  |Other or Multiple Races, Non-Hispanic          | 11093|
-|Race and Ethnicity  |Black, Non-Hispanic                            | 11067|
-|Race and Ethnicity  |Asian, Non-Hispanic                            |  1712|
-|Race and Ethnicity  |American Indian or Alaska Native, Non-Hispanic |  1702|
-
-Here is what I have:
-
-Please notice that the age categories have overlap, so it's clear that these data are pre-aggregated, and we'll want to make sure we use mutually exclusive categories
-
-Here is what I want:
-
-I want to create a time series that shows the vacciation rate, by age, over time
-
-Before you give me code, what do you reccomend
-```
+Before you give me code, what do you recommend?
 
 It went over challenges and recommendations.
 
 We then asked it:
 
-```
-OK, give me that dataframe before we visualize
-```
+"OK, give me that dataframe before we visualize"
 
 ```{r}
 mutually_exclusive_ages <- c(
@@ -342,27 +163,11 @@ age_time_series <- clean_df |>
 glimpse(age_time_series)
 ```
 
-I responded:
-
-```{markdown}
-> glimpse(age_time_series)
-Rows: 85
-Columns: 4
-$ season_survey_year <fct> 2009-10, 2009-10, 2010-11, 2010-11, 2010-11, 2010-11, 2010-11, 2010-11, 2011-12, 2011-12, 2011-12, 2011-12, 2011-12, 2011-12, 2012-13, 20…
-$ age_group          <fct> ">=65 Years", "50-64 Years", ">=65 Years", "13-17 Years", "18-49 Years", "5-12 Years", "50-64 Years", "6 Months - 4 Years", ">=65 Years",…
-$ mean_estimate      <dbl> 46.28232, 38.60872, 52.04114, 30.16828, 25.02017, 43.74000, 35.90828, 51.23814, 51.03056, 28.14342, 23.20322, 43.89715, 33.89848, 54.0487…
-$ n_records          <int> 1680, 1158, 598, 558, 575, 585, 580, 582, 602, 562, 590, 596, 592, 580, 614, 583, 606, 626, 607, 618, 603, 588, 592, 639, 590, 627, 616, …
-> 
-
-give me four lines for each group, annotated, by year
-```
-
 ### Data Visualization
 
-With the data now prepared and us asking for a line plot broken apart by age group, it gave us the following code, which worked the first time.
+With the data now prepared and us asking for a line plot broken apart by age group, it gave us the following code, which worked the first time:
 
 ```{r}
-
 ggplot(age_time_series, aes(x = season_survey_year, y = mean_estimate, group = age_group, color = age_group)) +
   geom_line(linewidth = 1.2) +
   geom_point(size = 2) +
@@ -377,7 +182,7 @@ ggplot(age_time_series, aes(x = season_survey_year, y = mean_estimate, group = a
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "bottom"
   )
-
 ```
 
 This image needs refinement, which ChatGPT would happily provide if we continued, but it worked. We wrote zero code ourselves.
+

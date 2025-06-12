@@ -10,6 +10,12 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
+# Install required packages if not already installed
+required_packages <- c("dplyr", "tidyr", "janitor", "readr", "forcats", "kableExtra")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load required packages
 library(dplyr)
 library(tidyr)
 library(janitor)
@@ -91,7 +97,7 @@ state_data <- readr::read_csv(here::here("data/raw/race_by_state_census2020.csv"
 
 state_data |> kable()
 
-readr::write_csv(state_data, here::here("data/raw/state_data.csv"))
+readr::write_csv(state_data, here::here("data/processed/state_data.csv"))
 ```
 
 ## Providers
@@ -453,7 +459,7 @@ analysis_data <- data |> select(
     race_ethnicity = race
   )
 
-readr::write_csv(analysis_data, here::here("data/processed/simulated_data.csv")) 
+readr::write_csv(analysis_data, here::here("data/processed/simulated_maternal_health_data.csv")) 
 
 ```
 

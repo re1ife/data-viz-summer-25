@@ -1,0 +1,292 @@
+---
+title: "Application 2: Choropleths"
+author: "Erik Westlund"
+date: "2025-06-12"
+
+editor:
+  render-on-save: true
+---
+
+```{r setup}
+#| message: false
+
+# List of required packages
+required_packages <- c(
+  "readr",
+  "dplyr",
+  "ggplot2",
+  "forcats",
+  "tidyr",
+  "kableExtra",
+  "stringr",
+  "ggrepel",
+  "maps",
+  "usmap",
+  "sf"
+)
+
+# Install missing packages
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load all packages
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(tidyr)
+library(kableExtra)
+library(stringr)
+library(ggrepel)
+library(maps)
+library(usmap)
+library(sf)
+
+source(here::here("examples", "colors.R"))
+```
+
+## Load and Prepare
+
+As usual, we start by loading and preparing the data.
+
+```{r data_prep}
+#| message: false
+
+data <- readr::read_csv(here::here("data", "processed", "simulated_data.csv"))
+state_data <- readr::read_csv(here::here("data", "processed", "state_data.csv"))
+
+data <- data |>
+  mutate(
+    state = as.factor(state),
+    received_comprehensive_postnatal_care = as.numeric(received_comprehensive_postnatal_care),
+    insurance = fct_relevel(insurance, "no_insurance"),
+    race_ethnicity = fct_relevel(race_ethnicity, "white"),
+    edu = fct_relevel(edu, "hs"),
+    job_type = fct_relevel(job_type, "unemployed"),
+  )
+
+data$self_report_income <- factor(data$self_report_income, levels = c(
+  "0–$25,000",
+  "$25,000–$50,000",
+  "$50,000–$75,000",
+  "$75,000–$100,000",
+  "$100,000–$125,000",
+  "$125,000–$150,000",
+  "$150,000–$175,000",
+  "$175,000+"
+))
+
+# Set "$50,000–$75,000" as the reference category
+data$self_report_income <- fct_relevel(data$self_report_income, "$50,000–$75,000")
+
+race_ethnicity_labels <- c("American Indian or Alaska Native" = "aian",
+          "White" = "white",
+          "Black" = "black",
+          "Asian" = "asian",
+          "Hispanic" = "hispanic",
+          "Native Hawaiian or Pacific Islander" = "nhpi",
+          "Other" = "other")
+
+data |> head() |> kable()
+```
+
+## Basic Visualizations
+
+### Provider Trust
+
+From our causal model, we theorize three causes of provider trust:
+
+* Provider quality
+* Race/ethnicity
+* Cultural orientation (namely, trust in institutions)
+
+We observe race, but we do not observe provider quality or cultural orientation. 
+
+## Provider quality
+
+For provider quality, we hypothesize the political and economic conditions with respect to healthcare will influence provider quality. We do not observe provider quality directly, but we do observe what state the provider is in.
+
+Given all this, it may help us to see:
+
+* A breakdown of race/ethnicity
+* A breakdown of receipt of comprehensive care by race/ethnicity
+* A breakdown of receipt of comprehensive care by state
+* A breakdown of receipt of comprehensive care by race by state
+
+### Race/ethnicity
+
+For categorical variables, we typically first want to see a bar chart of the distribution of the variable.
+
+```{r race_ethnicity}
+
+# Bar chart
+ggplot(data, aes(race_ethnicity)) +
+  geom_bar() + 
+  theme_minimal()
+ 
+
+  ggplot(
+    data |>
+      count(race_ethnicity) |>
+      mutate(
+        proportion = n / sum(n),
+        race_ethnicity = fct_recode(
+          factor(race_ethnicity),
+          !!! race_ethnicity_labels
+        )
+      ) |>
+      arrange(desc(proportion)) |>
+      mutate(race_ethnicity = fct_inorder(race_ethnicity) |> fct_rev())
+    ,
+    aes(x = proportion, y = race_ethnicity)
+  ) +
+  geom_bar(stat = "identity",
+           fill = colors$blue$`100`,
+           color = colors$blue$`400`) +
+  scale_x_continuous(
+    labels = scales::percent_format(accuracy = 1),
+    expand = expansion(mult = c(0, 0.2))  # Add 20% padding on the right
+  ) +
+  labs(x = "", y = "", title = "Patients by Race/Ethnicity", caption = "Source: Simulated Data") +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = "bold"),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold")
+  )
+
+# RCP vs. Race/Ethnicity
+plot_data <- data |>
+  group_by(race_ethnicity) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care),
+    n = n()
+  ) |>
+  ungroup() |>
+  mutate(
+    race_ethnicity = fct_recode(factor(race_ethnicity), !!!race_ethnicity_labels),
+    race_ethnicity = fct_reorder(race_ethnicity, proportion)
+  )
+
+# Plot proportions by race
+ggplot(plot_data, aes(x = proportion, y = race_ethnicity)) +
+  geom_bar(stat = "identity", fill = colors$blue$`100`, color = colors$blue$`400`) +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = "",
+    y = "",
+    title = "Receipt of Comprehensive Postnatal Care by Race/Ethnicity",
+    caption = "Source: Simulated Data"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14, face = "bold"),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold")
+  )
+```
+
+## Choropleth
+
+We will now map the receipt of comprehensive postnatal care by state.  This is a choropleth map.
+
+Please note that you must think hard about whether it makes sense to map the data you are mapping. For example, if you are mapping the number of people who have received comprehensive postnatal care, you must think about whether it makes sense to compare states with different populations. In our case, we know that every state is evenly represented and every person has the same probability of being in the sample. However, these assumptions rarely hold with true to life research designs. 
+
+
+
+
+
+```{r map}
+
+us_map <- us_map(regions = "states")
+
+rcp_by_state_data <- data |>
+  group_by(state) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care),
+    n = n()
+  ) |>
+  ungroup()
+
+# Merge summarized data with map data
+rcp_by_state_data_mappable <- us_map |>
+  left_join(
+    rcp_by_state_data, 
+    by = c("abbr"="state")
+  )
+
+ggplot(data = rcp_by_state_data_mappable) +
+  geom_sf(aes(fill = proportion), color = "white") +
+  scale_fill_continuous(
+    low = colors$blue$`50`,
+    high = colors$blue$`900`,
+    name = "Proportion",
+    labels = scales::percent,
+  ) +
+  labs(
+    title = "Proportion Receiving Comprehensive Postnatal Care By State",
+    caption = "Source: Simulated Data"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold")
+  )
+
+```
+
+## Small Multiples
+
+Even choropleths benefit from faceting by small multiples.
+
+```{r}
+# Will it work? Maps  by state
+race_ethnicity_care_data <- data |>
+  group_by(state, race_ethnicity) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care, na.rm = TRUE),
+    n = n(),
+    	.groups = "drop"
+  ) |>
+  ungroup() |>
+  mutate(
+    race_ethnicity = fct_recode(race_ethnicity, !!!race_ethnicity_labels)
+  )
+
+race_ethnicity_care_sf <- us_map |>
+  left_join(
+	race_ethnicity_care_data,
+	by = c("abbr" = "state")
+  )
+
+ggplot(race_ethnicity_care_sf) +
+  geom_sf(aes(geometry = geom, fill = proportion), color = "white", size = 0.1) +
+  scale_fill_continuous(
+    low = colors$blue$`100`,
+    high = colors$blue$`900`,
+    name = "Proportion",
+    labels = scales::percent,
+    na.value = "grey90"
+  ) +
+  facet_wrap(~ race_ethnicity, ncol = 3, nrow = 3) +
+  labs(
+    title = "Proportion Receiving Comprehensive Postnatal Care by Race",
+    fill = "Proportion",
+    caption = "Source: Simulated Data"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+    strip.text = element_text(size = 10)
+  )
+
+```
+
+Choropleths can be useful, but they can be misleading. In fact, they often end up encoding things like population density as much as the spatial variation we are trying to visualize.
+
+

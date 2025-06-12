@@ -3453,9 +3453,12 @@ window.onload = function() {
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
   <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
+  <li><a href="#overview-1" id="toc-overview-1" class="nav-link" data-scroll-target="#overview-1">Overview</a></li>
+  <li><a href="#data-preparation-1" id="toc-data-preparation-1" class="nav-link" data-scroll-target="#data-preparation-1">Data Preparation</a></li>
   <li><a href="#chat-with-the-llm" id="toc-chat-with-the-llm" class="nav-link" data-scroll-target="#chat-with-the-llm">Chat with the LLM</a>
   <ul class="collapse">
-  <li><a href="#data-preparation-1" id="toc-data-preparation-1" class="nav-link" data-scroll-target="#data-preparation-1">Data Preparation</a></li>
+  <li><a href="#data-preparation-2" id="toc-data-preparation-2" class="nav-link" data-scroll-target="#data-preparation-2">Data Preparation</a></li>
+  <li><a href="#initial-data-exploration" id="toc-initial-data-exploration" class="nav-link" data-scroll-target="#initial-data-exploration">Initial Data Exploration</a></li>
   <li><a href="#data-summary" id="toc-data-summary" class="nav-link" data-scroll-target="#data-summary">Data Summary</a></li>
   <li><a href="#data-visualization" id="toc-data-visualization" class="nav-link" data-scroll-target="#data-visualization">Data Visualization</a></li>
   </ul></li>
@@ -3510,6 +3513,16 @@ window.onload = function() {
 </section>
 <section id="data-preparation" class="level2">
 <h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
+</section>
+<section id="overview-1" class="level2">
+<h2 class="anchored" data-anchor-id="overview-1">Overview</h2>
+<ul>
+<li>We’ll use an LLM to help us prepare data for a visualization</li>
+<li>Let’s use the <a href="https://data.cdc.gov/Flu-Vaccinations/Influenza-Vaccination-Coverage-for-All-Ages-6-Mont/vh55-3he6/about_data">CDC’s data on influenza vaccination coverage for all ages</a></li>
+</ul>
+</section>
+<section id="data-preparation-1" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation-1">Data Preparation</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;</span>))</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -3533,83 +3546,52 @@ $ `Sample Size`        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, 48, 48, 552, 552, 552
 </section>
 <section id="chat-with-the-llm" class="level2">
 <h2 class="anchored" data-anchor-id="chat-with-the-llm">Chat with the LLM</h2>
-<section id="data-preparation-1" class="level3">
-<h3 class="anchored" data-anchor-id="data-preparation-1">Data Preparation</h3>
+<section id="data-preparation-2" class="level3">
+<h3 class="anchored" data-anchor-id="data-preparation-2">Data Preparation</h3>
 <p>From here, we can chat with the LLM to help us prepare the data for a visualization.</p>
-<p>[Below I provide key aspects of the prompt’s sent to the ChatGPT LLM as well as the results. I’ve excluded some of the LLM’s missteps.]</p>
+<p>Below I provide key aspects of the prompts sent to the ChatGPT LLM as well as the results. I’ve excluded some of the LLM’s missteps.</p>
+</section>
+<section id="initial-data-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="initial-data-exploration">Initial Data Exploration</h3>
+<p>I am working with an unfamiliar data set. Here is a glimpse using dplyr:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>I am working with an unfamiliar data set</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>Here is a glimpse using dplyr</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>what do you see</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; df &lt;- read_csv(here::here(&quot;data&quot;, &quot;raw&quot;, &quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;))</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">Rows: 220729 Columns: 11                                                                                                                                                                               </span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">Delimiter: &quot;,&quot;</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">chr (9): Vaccine, Geography Type, Geography, FIPS, Season/Survey Year, Dimension Type, Dimension, Estimate (%), 95% CI (%)</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">dbl (2): Month, Sample Size</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>ℹ Use spec() to retrieve the full column specification for this data.</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>ℹ Specify the column types or set show_col_types = FALSE to quiet this message.</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; df </span><span class="pp">|</span><span class="at">&gt; glimpse()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 220729 Columns: 11
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (9): Vaccine, Geography Type, Geography, FIPS, Season/Survey Year, Dimen...
+dbl (2): Month, Sample Size
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 220,729
+Columns: 11
+$ Vaccine              &lt;chr&gt; &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seas…
+$ `Geography Type`     &lt;chr&gt; &quot;Counties&quot;, &quot;Counties&quot;, &quot;Counties&quot;, &quot;Counties&quot;, &quot;…
+$ Geography            &lt;chr&gt; &quot;New Haven&quot;, &quot;New Haven&quot;, &quot;New Haven&quot;, &quot;New Haven…
+$ FIPS                 &lt;chr&gt; &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;090…
+$ `Season/Survey Year` &lt;chr&gt; &quot;2018&quot;, &quot;2021&quot;, &quot;2020&quot;, &quot;2021&quot;, &quot;2018&quot;, &quot;2019&quot;, &quot;…
+$ Month                &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 5, 4, 11, 10, 9, 8, 9, 1, 12, 1…
+$ `Dimension Type`     &lt;chr&gt; &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;Age&quot;, &quot;Age&quot;, &quot;Age&quot;, …
+$ Dimension            &lt;chr&gt; &quot;Non-Medical Setting&quot;, &quot;Non-Medical Setting&quot;, &quot;&gt;=…
+$ `Estimate (%)`       &lt;chr&gt; &quot;45.5&quot;, &quot;53.0&quot;, &quot;52.4&quot;, &quot;50.2&quot;, &quot;34.0&quot;, &quot;49.5&quot;, &quot;…
+$ `95% CI (%)`         &lt;chr&gt; &quot;43.9 to 47.2&quot;, &quot;46.0 to 60.9&quot;, &quot;50.6 to 54.3&quot;, &quot;…
+$ `Sample Size`        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, 48, 48, 552, 552, 552, 55…</code></pre>
+</div>
 </div>
 <p>The bot then summarized the data set.</p>
-<p>Using the following prompt, We then sent the LLM the actual data file for more context (🚨 do not do this with private data! 🚨)</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>I am actually going to give you the file.  Interpret it. We are going to use dplyr and ggplot2 to prepare it and visualize aspects of it.</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>tell me what you see</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>Using the following prompt, we then sent the LLM the actual data file for more context (🚨 do not do this with private data! 🚨):</p>
+<p>“I am actually going to give you the file. Interpret it. We are going to use dplyr and ggplot2 to prepare it and visualize aspects of it. Tell me what you see.”</p>
 <p>It responded with a summary, warning us about some of the odd structures of the data.</p>
 <p>We then asked it to clean the data:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Yes, let&#39;s get clean, standardized column names. Let&#39;s make all factor variables factor types. Lets extract the confidence intervals into separate columns.  Let&#39;s just start there. Give me R code that I can paste into RStudio.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>“Yes, let’s get clean, standardized column names. Let’s make all factor variables factor types. Let’s extract the confidence intervals into separate columns. Let’s just start there. Give me R code that I can paste into RStudio.”</p>
 <p>Please note from here on out, ChatGPT gave us code that includes library calls and new code. The library calls are loaded above.</p>
 <p>It first gave us back broken code because it did not understand fully the results of applying <code>clean_names()</code> to the data.</p>
-<p>We eventually sent it the following, explanining the data structure, after which it recovered:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>It wasn&#39;t working, so I did this (removed columns that broke the code)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu"># Clean and prepare</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>clean_df &lt;- df |&gt;</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  clean_names() |&gt;</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  mutate(</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    vaccine = factor(vaccine),</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    geography_type = factor(geography_type),</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    geography = factor(geography),</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    season_survey_year = factor(season_survey_year),</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    dimension_type = factor(dimension_type),</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    dimension = factor(dimension)</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu"># Preview result</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>glimpse(clean_df)</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>and got back:</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; glimpse(clean_df)</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a><span class="at">Rows: 220,729</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="at">Columns: 11</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="at">$ vaccine                </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;…</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="at">$ geography_type         </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> Counties, Counties, Counties, Counties, Counties, Counties, States/Local Areas, States/Local Areas, States/Local Areas, States/Local …</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="at">$ geography              </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> New Haven, New Haven, New Haven, New Haven, New Haven, New Haven, New Jersey, New Jersey, New Jersey, New Jersey, New Jersey, New Jer…</span></span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="at">$ fips                   </span><span class="dt">&lt;</span><span class="kw">chr</span><span class="dt">&gt;</span><span class="at"> &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;…</span></span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="at">$ season_survey_year     </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> 2018, 2021, 2020, 2021, 2018, 2019, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10…</span></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="at">$ month                  </span><span class="dt">&lt;</span><span class="kw">dbl</span><span class="dt">&gt;</span><span class="at"> 1, 1, 1, 1, 1, 1, 5, 4, 11, 10, 9, 8, 9, 1, 12, 11, 10, 3, 2, 5, 4, 3, 2, 1, 12, 5, 5, 4, 3, 2, 12, 5, 8, 4, 3, 2, 1, 12, 11, 10, 9, …</span></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="at">$ dimension_type         </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &gt;=18 Years, &gt;=18 Years, Age, Age, Age, Age, Race and Ethnicity, Race and Ethnicity, Race and Ethnicity, Race and Ethnicity, Race and …</span></span>
-<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="at">$ dimension              </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &quot;Non-Medical Setting&quot;, &quot;Non-Medical Setting&quot;, &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;American Indian or Alaska Nati…</span></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="at">$ estimate_percent       </span><span class="dt">&lt;</span><span class="kw">chr</span><span class="dt">&gt;</span><span class="at"> &quot;45.5&quot;, &quot;53.0&quot;, &quot;52.4&quot;, &quot;50.2&quot;, &quot;34.0&quot;, &quot;49.5&quot;, &quot;57.7&quot;, &quot;57.7&quot;, &quot;34.7&quot;, &quot;24.8&quot;, &quot;10.8&quot;, &quot;NR †&quot;, &quot;NR †&quot;, &quot;57.7&quot;, &quot;54.8&quot;, &quot;44.4&quot;, &quot;NR †…</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="at">$ x95_percent_ci_percent </span><span class="dt">&lt;</span><span class="kw">chr</span><span class="dt">&gt;</span><span class="at"> &quot;43.9 to 47.2&quot;, &quot;46.0 to 60.9&quot;, &quot;50.6 to 54.3&quot;, &quot;45.4 to 55.8&quot;, &quot;32.6 to 35.5&quot;, &quot;47.8 to 51.3&quot;, &quot;40.2 to 75.2 ‡&quot;, &quot;40.2 to 75.2 ‡&quot;, &quot;…</span></span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="at">$ sample_size            </span><span class="dt">&lt;</span><span class="kw">dbl</span><span class="dt">&gt;</span><span class="at"> NA, NA, NA, NA, NA, NA, 48, 48, 552, 552, 552, 552, 48, 48, 48, 48, 48, 48, 48, 2554, 2554, 2554, 2554, 2554, 2554, 8306, 3107, 3107,…</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>try again</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>This context helped if finds its way and we ended up with the following code block:</p>
+<p>We eventually sent it the following, explaining the data structure, after which it recovered:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean and prepare</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
@@ -3621,14 +3603,20 @@ $ `Sample Size`        &lt;dbl&gt; NA, NA, NA, NA, NA, NA, 48, 48, 552, 552, 552
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">season_survey_year =</span> <span class="fu">factor</span>(season_survey_year),</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">dimension_type =</span> <span class="fu">factor</span>(dimension_type),</span>
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">dimension =</span> <span class="fu">factor</span>(dimension),</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>     <span class="at">estimate =</span> <span class="fu">as.numeric</span>(<span class="fu">str_replace</span>(estimate_percent, <span class="st">&quot;[^0-9.]&quot;</span>, <span class="st">&quot;&quot;</span>)),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> <span class="fu">as.numeric</span>(<span class="fu">str_replace</span>(estimate_percent, <span class="st">&quot;[^0-9.]&quot;</span>, <span class="st">&quot;&quot;</span>)),</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_clean =</span> <span class="fu">str_remove</span>(x95_percent_ci_percent, <span class="st">&quot; ‡| †&quot;</span>),</span>
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_lower =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(ci_clean, <span class="st">&quot;^[0-9.]+&quot;</span>)),</span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_upper =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(ci_clean, <span class="st">&quot;[0-9.]+$&quot;</span>))</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview result</span></span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(clean_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: There was 1 warning in `mutate()`.
+ℹ In argument: `estimate = as.numeric(str_replace(estimate_percent, &quot;[^0-9.]&quot;,
+  &quot;&quot;))`.
+Caused by warning:
+! NAs introduced by coercion</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview result</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(clean_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 220,729
 Columns: 15
@@ -3652,451 +3640,120 @@ $ ci_upper               &lt;dbl&gt; 47.2, 60.9, 54.3, 55.8, 35.5, 51.3, 75.2, 7
 </section>
 <section id="data-summary" class="level3">
 <h3 class="anchored" data-anchor-id="data-summary">Data Summary</h3>
-<p>We then sent it this to inform it of the structure of the data, which is somewhat unusual.</p>
+<p>We then sent it this to inform it of the structure of the data, which is somewhat unusual:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; table(clean_df$dimension)</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">&gt;=18 Years                                              &gt;=6 Months </span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  26534                                                   10449 </span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="at">                                             &gt;=65 Years                                             13-17 Years </span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  10903                                                   10265 </span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="at">                                            18-49 Years                                18-49 Years at High Risk </span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   9931                                                   11038 </span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="at">                           18-49 Years not at High Risk                                             18-64 Years </span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   9257                                                    9942 </span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="at">                               18-64 Years at High Risk                            18-64 Years not at High Risk </span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   9898                                                    8018 </span></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a><span class="at">                               25-64 Years at High Risk                 25-64 Years not in Initial Target Group </span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    496                                                     496 </span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="at">                                             5-12 Years                                             50-64 Years </span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  10279                                                   11125 </span></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="at">                                    6 Months - 17 Years                                      6 Months - 4 Years </span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  12018                                                   10282 </span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a><span class="at">6 Months - 64 Years at High Risk (Initial Target Group)          American Indian or Alaska Native, Non-Hispanic </span></span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    496                                                    1702 </span></span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a><span class="at">                                    Asian, Non-Hispanic                                     Black, Non-Hispanic </span></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   1712                                                   11067 </span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a><span class="at">                                             Greater 65                               Greater than 18 Years flu </span></span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    770                                                     770 </span></span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a><span class="at">                              Greater than 6 Months flu                                                Hispanic </span></span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    682                                                   11106 </span></span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a><span class="at">                                        Medical Setting                                     Non-Medical Setting </span></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    770                                                    6975 </span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a><span class="at">                  Other or Multiple Races, Non-Hispanic                                          Pharmacy/Store </span></span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  11093                                                     770 </span></span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a><span class="at">                                                 School                                     White, Non-Hispanic </span></span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    198                                                   11115 </span></span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a><span class="at">                                              Workplace </span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    572 </span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; table(clean_df$dimension_type)</span></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>         <span class="at">&gt;=18 Years          &gt;=65 Years         18-49 Years         18-64 Years         50-64 Years 6 Months - 17 Years                 Age  Race and Ethnicity </span></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="at">               6829                 416                 416                 416                 416                 792              163649               47795 </span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>I tabulated the dimensions, and this is what you get.   Can you give me summarize code to make more sense of this that i can put in a notebook?</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(clean_df<span class="sc">$</span>dimension)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                                             &gt;=18 Years 
+                                                  26534 
+                                             &gt;=6 Months 
+                                                  10449 
+                                             &gt;=65 Years 
+                                                  10903 
+                                            13-17 Years 
+                                                  10265 
+                                            18-49 Years 
+                                                   9931 
+                               18-49 Years at High Risk 
+                                                  11038 
+                           18-49 Years not at High Risk 
+                                                   9257 
+                                            18-64 Years 
+                                                   9942 
+                               18-64 Years at High Risk 
+                                                   9898 
+                           18-64 Years not at High Risk 
+                                                   8018 
+                               25-64 Years at High Risk 
+                                                    496 
+                25-64 Years not in Initial Target Group 
+                                                    496 
+                                             5-12 Years 
+                                                  10279 
+                                            50-64 Years 
+                                                  11125 
+                                    6 Months - 17 Years 
+                                                  12018 
+                                     6 Months - 4 Years 
+                                                  10282 
+6 Months - 64 Years at High Risk (Initial Target Group) 
+                                                    496 
+         American Indian or Alaska Native, Non-Hispanic 
+                                                   1702 
+                                    Asian, Non-Hispanic 
+                                                   1712 
+                                    Black, Non-Hispanic 
+                                                  11067 
+                                             Greater 65 
+                                                    770 
+                              Greater than 18 Years flu 
+                                                    770 
+                              Greater than 6 Months flu 
+                                                    682 
+                                               Hispanic 
+                                                  11106 
+                                        Medical Setting 
+                                                    770 
+                                    Non-Medical Setting 
+                                                   6975 
+                  Other or Multiple Races, Non-Hispanic 
+                                                  11093 
+                                         Pharmacy/Store 
+                                                    770 
+                                                 School 
+                                                    198 
+                                    White, Non-Hispanic 
+                                                  11115 
+                                              Workplace 
+                                                    572 </code></pre>
 </div>
-<p>It returned us the following:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dimension_type_summary <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(dimension_type, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span>                       <span class="co"># tally rows</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span>                                        <span class="co"># largest first</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percent_of_total =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))                       <span class="co"># share of entire data set</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 ── full breakdown: every dimension within each type -----------------------</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>dimension_breakdown <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(dimension_type, dimension, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span>            <span class="co"># tally rows</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(dimension_type) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_within_type =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n),                         <span class="co"># share inside the parent type</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">rank_within_type   =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(n))                  <span class="co"># rank for convenience</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(dimension_type, <span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="do">## (optional) keep only the 5 largest dimensions per type ----------------------</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>top5_breakdown <span class="ot">&lt;-</span> dimension_breakdown <span class="sc">%&gt;%</span> </span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rank_within_type <span class="sc">&lt;=</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>rank_within_type)                                   <span class="co"># drop helper column</span></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="do">## ── Quick display ------------------------------------------------------------</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>dimension_type_summary <span class="sc">%&gt;%</span> </span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">&quot;Records by dimension_type&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Records by dimension_type</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">dimension_type</th>
-<th style="text-align: right;">n</th>
-<th style="text-align: right;">percent_of_total</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Age</td>
-<td style="text-align: right;">163649</td>
-<td style="text-align: right;">0.74</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Race and Ethnicity</td>
-<td style="text-align: right;">47795</td>
-<td style="text-align: right;">0.22</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">&gt;=18 Years</td>
-<td style="text-align: right;">6829</td>
-<td style="text-align: right;">0.03</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">6 Months - 17 Years</td>
-<td style="text-align: right;">792</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">&gt;=65 Years</td>
-<td style="text-align: right;">416</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">18-49 Years</td>
-<td style="text-align: right;">416</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">18-64 Years</td>
-<td style="text-align: right;">416</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">50-64 Years</td>
-<td style="text-align: right;">416</td>
-<td style="text-align: right;">0.00</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>top5_breakdown <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">&quot;Top-5 dimensions within each dimension_type&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Top-5 dimensions within each dimension_type</caption>
-<colgroup>
-<col style="width: 23%">
-<col style="width: 45%">
-<col style="width: 7%">
-<col style="width: 23%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">dimension_type</th>
-<th style="text-align: left;">dimension</th>
-<th style="text-align: right;">n</th>
-<th style="text-align: right;">percent_within_type</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">&gt;=18 Years</td>
-<td style="text-align: left;">Non-Medical Setting</td>
-<td style="text-align: right;">6361</td>
-<td style="text-align: right;">0.93</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">&gt;=18 Years</td>
-<td style="text-align: left;">Medical Setting</td>
-<td style="text-align: right;">156</td>
-<td style="text-align: right;">0.02</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">&gt;=18 Years</td>
-<td style="text-align: left;">Pharmacy/Store</td>
-<td style="text-align: right;">156</td>
-<td style="text-align: right;">0.02</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">&gt;=18 Years</td>
-<td style="text-align: left;">Workplace</td>
-<td style="text-align: right;">156</td>
-<td style="text-align: right;">0.02</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">&gt;=65 Years</td>
-<td style="text-align: left;">Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">&gt;=65 Years</td>
-<td style="text-align: left;">Non-Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">&gt;=65 Years</td>
-<td style="text-align: left;">Pharmacy/Store</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">&gt;=65 Years</td>
-<td style="text-align: left;">Workplace</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">18-49 Years</td>
-<td style="text-align: left;">Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">18-49 Years</td>
-<td style="text-align: left;">Non-Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">18-49 Years</td>
-<td style="text-align: left;">Pharmacy/Store</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">18-49 Years</td>
-<td style="text-align: left;">Workplace</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">18-64 Years</td>
-<td style="text-align: left;">Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">18-64 Years</td>
-<td style="text-align: left;">Non-Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">18-64 Years</td>
-<td style="text-align: left;">Pharmacy/Store</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">18-64 Years</td>
-<td style="text-align: left;">Workplace</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">50-64 Years</td>
-<td style="text-align: left;">Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">50-64 Years</td>
-<td style="text-align: left;">Non-Medical Setting</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">50-64 Years</td>
-<td style="text-align: left;">Pharmacy/Store</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">50-64 Years</td>
-<td style="text-align: left;">Workplace</td>
-<td style="text-align: right;">104</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">6 Months - 17 Years</td>
-<td style="text-align: left;">Medical Setting</td>
-<td style="text-align: right;">198</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">6 Months - 17 Years</td>
-<td style="text-align: left;">Non-Medical Setting</td>
-<td style="text-align: right;">198</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">6 Months - 17 Years</td>
-<td style="text-align: left;">Pharmacy/Store</td>
-<td style="text-align: right;">198</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">6 Months - 17 Years</td>
-<td style="text-align: left;">School</td>
-<td style="text-align: right;">198</td>
-<td style="text-align: right;">0.25</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Age</td>
-<td style="text-align: left;">&gt;=18 Years</td>
-<td style="text-align: right;">26534</td>
-<td style="text-align: right;">0.16</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Age</td>
-<td style="text-align: left;">6 Months - 17 Years</td>
-<td style="text-align: right;">12018</td>
-<td style="text-align: right;">0.07</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Age</td>
-<td style="text-align: left;">50-64 Years</td>
-<td style="text-align: right;">11125</td>
-<td style="text-align: right;">0.07</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Age</td>
-<td style="text-align: left;">18-49 Years at High Risk</td>
-<td style="text-align: right;">11038</td>
-<td style="text-align: right;">0.07</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Age</td>
-<td style="text-align: left;">&gt;=65 Years</td>
-<td style="text-align: right;">10903</td>
-<td style="text-align: right;">0.07</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Race and Ethnicity</td>
-<td style="text-align: left;">White, Non-Hispanic</td>
-<td style="text-align: right;">11115</td>
-<td style="text-align: right;">0.23</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Race and Ethnicity</td>
-<td style="text-align: left;">Hispanic</td>
-<td style="text-align: right;">11106</td>
-<td style="text-align: right;">0.23</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Race and Ethnicity</td>
-<td style="text-align: left;">Other or Multiple Races, Non-Hispanic</td>
-<td style="text-align: right;">11093</td>
-<td style="text-align: right;">0.23</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Race and Ethnicity</td>
-<td style="text-align: left;">Black, Non-Hispanic</td>
-<td style="text-align: right;">11067</td>
-<td style="text-align: right;">0.23</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Race and Ethnicity</td>
-<td style="text-align: left;">Asian, Non-Hispanic</td>
-<td style="text-align: right;">1712</td>
-<td style="text-align: right;">0.04</td>
-</tr>
-</tbody>
-</table>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(clean_df<span class="sc">$</span>dimension_type)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+         &gt;=18 Years          &gt;=65 Years         18-49 Years         18-64 Years 
+               6829                 416                 416                 416 
+        50-64 Years 6 Months - 17 Years                 Age  Race and Ethnicity 
+                416                 792              163649               47795 </code></pre>
 </div>
 </div>
-<p>I then gave if this response:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; # Display top 10 per type (optional, remove if you want all)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; dimension_summary </span><span class="pp">|</span><span class="at">&gt;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>group_by(dimension_type) |&gt;</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>slice_head(n = 10) |&gt;</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>ungroup() |&gt;</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>knitr::kable()</span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>dimension_type      <span class="pp">|</span>dimension                                      <span class="pp">|</span>     n<span class="pp">|</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="pp">|:-------------------|:----------------------------------------------|-----:|</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>  6361<span class="pp">|</span></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   156<span class="pp">|</span></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   156<span class="pp">|</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   156<span class="pp">|</span></span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>School                                         <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>&gt;=18 Years                                     <span class="pp">|</span> 26534<span class="pp">|</span></span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>6 Months - 17 Years                            <span class="pp">|</span> 12018<span class="pp">|</span></span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>50-64 Years                                    <span class="pp">|</span> 11125<span class="pp">|</span></span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>18-49 Years at High Risk                       <span class="pp">|</span> 11038<span class="pp">|</span></span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>&gt;=65 Years                                     <span class="pp">|</span> 10903<span class="pp">|</span></span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>&gt;=6 Months                                     <span class="pp">|</span> 10449<span class="pp">|</span></span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>6 Months - 4 Years                             <span class="pp">|</span> 10282<span class="pp">|</span></span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>5-12 Years                                     <span class="pp">|</span> 10279<span class="pp">|</span></span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>13-17 Years                                    <span class="pp">|</span> 10265<span class="pp">|</span></span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>18-64 Years                                    <span class="pp">|</span>  9942<span class="pp">|</span></span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>White, Non-Hispanic                            <span class="pp">|</span> 11115<span class="pp">|</span></span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Hispanic                                       <span class="pp">|</span> 11106<span class="pp">|</span></span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Other or Multiple Races, Non-Hispanic          <span class="pp">|</span> 11093<span class="pp">|</span></span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Black, Non-Hispanic                            <span class="pp">|</span> 11067<span class="pp">|</span></span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Asian, Non-Hispanic                            <span class="pp">|</span>  1712<span class="pp">|</span></span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>American Indian or Alaska Native, Non-Hispanic <span class="pp">|</span>  1702<span class="pp">|</span></span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>Here is what I have:</span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>Please notice that the age categories have overlap, so it&#39;s clear that these data are pre-aggregated, and we&#39;ll want to make sure we use mutually exclusive categories</span>
-<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a>Here is what I want:</span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>I want to create a time series that shows the vacciation rate, by age, over time</span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a>Before you give me code, what do you reccomend</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<p>Here is what we have:</p>
+<p>Please notice that the age categories have overlap, so it’s clear that these data are pre-aggregated, and we’ll want to make sure we use mutually exclusive categories.</p>
+<p>Here is what we want:</p>
+<p>We want to create a time series that shows the vaccination rate, by age, over time.</p>
+<p>Before you give me code, what do you recommend?</p>
 <p>It went over challenges and recommendations.</p>
 <p>We then asked it:</p>
-<pre><code>OK, give me that dataframe before we visualize</code></pre>
+<p>“OK, give me that dataframe before we visualize”</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>mutually_exclusive_ages <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;6 Months - 4 Years&quot;</span>,</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;5-12 Years&quot;</span>,</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;13-17 Years&quot;</span>,</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;18-49 Years&quot;</span>,</span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;50-64 Years&quot;</span>,</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;&gt;=65 Years&quot;</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the cleaned time series dataframe</span></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>age_time_series <span class="ot">&lt;-</span> clean_df <span class="sc">|&gt;</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    dimension_type <span class="sc">==</span> <span class="st">&quot;Age&quot;</span>,</span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    dimension <span class="sc">%in%</span> mutually_exclusive_ages,</span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(estimate)</span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(season_survey_year, <span class="at">age_group =</span> dimension) <span class="sc">|&gt;</span></span>
-<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_records =</span> <span class="fu">n</span>(),</span>
-<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_group =</span> <span class="fu">fct_relevel</span>(age_group, mutually_exclusive_ages)</span>
-<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a><span class="co"># View the resulting structure</span></span>
-<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(age_time_series)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>mutually_exclusive_ages <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;6 Months - 4 Years&quot;</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;5-12 Years&quot;</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;13-17 Years&quot;</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;18-49 Years&quot;</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;50-64 Years&quot;</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;&gt;=65 Years&quot;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the cleaned time series dataframe</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>age_time_series <span class="ot">&lt;-</span> clean_df <span class="sc">|&gt;</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    dimension_type <span class="sc">==</span> <span class="st">&quot;Age&quot;</span>,</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    dimension <span class="sc">%in%</span> mutually_exclusive_ages,</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(estimate)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(season_survey_year, <span class="at">age_group =</span> dimension) <span class="sc">|&gt;</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_records =</span> <span class="fu">n</span>(),</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_group =</span> <span class="fu">fct_relevel</span>(age_group, mutually_exclusive_ages)</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="co"># View the resulting structure</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(age_time_series)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 85
 Columns: 4
@@ -4106,23 +3763,10 @@ $ mean_estimate      &lt;dbl&gt; 46.28232, 38.60872, 52.04114, 30.16828, 25.0201
 $ n_records          &lt;int&gt; 1680, 1158, 598, 558, 575, 585, 580, 582, 602, 562,…</code></pre>
 </div>
 </div>
-<p>I responded:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; glimpse(age_time_series)</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="at">Rows: 85</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="at">Columns: 4</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="at">$ season_survey_year </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> 2009-10, 2009-10, 2010-11, 2010-11, 2010-11, 2010-11, 2010-11, 2010-11, 2011-12, 2011-12, 2011-12, 2011-12, 2011-12, 2011-12, 2012-13, 20…</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="at">$ age_group          </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &quot;&gt;=65 Years&quot;, &quot;50-64 Years&quot;, &quot;&gt;=65 Years&quot;, &quot;13-17 Years&quot;, &quot;18-49 Years&quot;, &quot;5-12 Years&quot;, &quot;50-64 Years&quot;, &quot;6 Months - 4 Years&quot;, &quot;&gt;=65 Years&quot;,…</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="at">$ mean_estimate      </span><span class="dt">&lt;</span><span class="kw">dbl</span><span class="dt">&gt;</span><span class="at"> 46.28232, 38.60872, 52.04114, 30.16828, 25.02017, 43.74000, 35.90828, 51.23814, 51.03056, 28.14342, 23.20322, 43.89715, 33.89848, 54.0487…</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="at">$ n_records          </span><span class="dt">&lt;</span><span class="kw">int</span><span class="dt">&gt;</span><span class="at"> 1680, 1158, 598, 558, 575, 585, 580, 582, 602, 562, 590, 596, 592, 580, 614, 583, 606, 626, 607, 618, 603, 588, 592, 639, 590, 627, 616, …</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>give me four lines for each group, annotated, by year</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 <section id="data-visualization" class="level3">
 <h3 class="anchored" data-anchor-id="data-visualization">Data Visualization</h3>
-<p>With the data now prepared and us asking for a line plot broken apart by age group, it gave us the following code, which worked the first time.</p>
+<p>With the data now prepared and us asking for a line plot broken apart by age group, it gave us the following code, which worked the first time:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(age_time_series, <span class="fu">aes</span>(<span class="at">x =</span> season_survey_year, <span class="at">y =</span> mean_estimate, <span class="at">group =</span> age_group, <span class="at">color =</span> age_group)) <span class="sc">+</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
@@ -4624,368 +4268,173 @@ $ n_records          &lt;int&gt; 1680, 1158, 598, 558, 575, 585, 580, 582, 602, 
 <span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
 <span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forcats)</span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;</span>))</span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Chat with the LLM</span></span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Preparation</span></span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>From here, we can chat with the LLM to help us prepare the data for a visualization.</span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Below I provide key aspects of the prompt&#39;s sent to the ChatGPT LLM as well as the results. I&#39;ve excluded some of the LLM&#39;s missteps.</span><span class="co">]</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Install required packages if not already installed</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>required_packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;forcats&quot;</span>, <span class="st">&quot;janitor&quot;</span>, <span class="st">&quot;kableExtra&quot;</span>, </span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>                      <span class="st">&quot;readr&quot;</span>, <span class="st">&quot;stringr&quot;</span>, <span class="st">&quot;tidyr&quot;</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>new_packages <span class="ot">&lt;-</span> required_packages[<span class="sc">!</span>(required_packages <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[,<span class="st">&quot;Package&quot;</span>])]</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(<span class="fu">length</span>(new_packages)) <span class="fu">install.packages</span>(new_packages)</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forcats)</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(janitor)</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(stringr)</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>We&#39;ll use an LLM to help us prepare data for a visualization</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Let&#39;s use the <span class="co">[</span><span class="ot">CDC&#39;s data on influenza vaccination coverage for all ages</span><span class="co">](https://data.cdc.gov/Flu-Vaccinations/Influenza-Vaccination-Coverage-for-All-Ages-6-Mont/vh55-3he6/about_data)</span></span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Preparation</span></span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
 <span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;</span>))</span>
 <span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>I am working with an unfamiliar data set</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## Chat with the LLM</span></span>
 <span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>Here is a glimpse using dplyr</span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Preparation</span></span>
 <span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>what do you see</span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>From here, we can chat with the LLM to help us prepare the data for a visualization.</span>
 <span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; df &lt;- read_csv(here::here(&quot;data&quot;, &quot;raw&quot;, &quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;))</span></span>
-<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a><span class="at">Rows: 220729 Columns: 11                                                                                                                                                                               </span></span>
-<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a><span class="at">── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</span></span>
-<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a><span class="at">Delimiter: &quot;,&quot;</span></span>
-<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a><span class="at">chr (9): Vaccine, Geography Type, Geography, FIPS, Season/Survey Year, Dimension Type, Dimension, Estimate (%), 95% CI (%)</span></span>
-<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a><span class="at">dbl (2): Month, Sample Size</span></span>
-<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>ℹ Use spec() to retrieve the full column specification for this data.</span>
-<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>ℹ Specify the column types or set show_col_types = FALSE to quiet this message.</span>
-<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span></span>
-<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; df </span><span class="pp">|</span><span class="at">&gt; glimpse()</span></span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>Below I provide key aspects of the prompts sent to the ChatGPT LLM as well as the results. I&#39;ve excluded some of the LLM&#39;s missteps.</span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a><span class="fu">### Initial Data Exploration</span></span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>I am working with an unfamiliar data set. Here is a glimpse using dplyr:</span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">&quot;data&quot;</span>, <span class="st">&quot;raw&quot;</span>, <span class="st">&quot;cdc_Influenza_Vaccination_Coverage_for_All_Ages__6__Months__20250610.csv&quot;</span>))</span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span>
 <span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a><span class="in">The bot then summarized the data set.</span></span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>The bot then summarized the data set.</span>
 <span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a><span class="in">Using the following prompt, We then sent the LLM the actual data file for more context (🚨 do not do this with private data! 🚨)</span></span>
+<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a>Using the following prompt, we then sent the LLM the actual data file for more context (🚨 do not do this with private data! 🚨):</span>
 <span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a><span class="in">I am actually going to give you the file.  Interpret it. We are going to use dplyr and ggplot2 to prepare it and visualize aspects of it.</span></span>
-<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a><span class="in">tell me what you see</span></span>
-<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>&quot;I am actually going to give you the file. Interpret it. We are going to use dplyr and ggplot2 to prepare it and visualize aspects of it. Tell me what you see.&quot;</span>
+<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a>It responded with a summary, warning us about some of the odd structures of the data.</span>
+<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a>We then asked it to clean the data:</span>
+<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a>&quot;Yes, let&#39;s get clean, standardized column names. Let&#39;s make all factor variables factor types. Let&#39;s extract the confidence intervals into separate columns. Let&#39;s just start there. Give me R code that I can paste into RStudio.&quot;</span>
 <span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a>It responded with a summary, warning us about some of the odd structures of the data.</span>
+<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a>Please note from here on out, ChatGPT gave us code that includes library calls and new code. The library calls are loaded above.</span>
 <span id="cb18-88"><a href="#cb18-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-89"><a href="#cb18-89" aria-hidden="true" tabindex="-1"></a>We then asked it to clean the data:</span>
+<span id="cb18-89"><a href="#cb18-89" aria-hidden="true" tabindex="-1"></a>It first gave us back broken code because it did not understand fully the results of applying <span class="in">`clean_names()`</span> to the data.</span>
 <span id="cb18-90"><a href="#cb18-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-93"><a href="#cb18-93" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-94"><a href="#cb18-94" aria-hidden="true" tabindex="-1"></a>Yes, let&#39;s get clean, standardized column names. Let&#39;s make all factor variables factor types. Lets extract the confidence intervals into separate columns.  Let&#39;s just start there. Give me R code that I can paste into RStudio.</span>
-<span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-96"><a href="#cb18-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-97"><a href="#cb18-97" aria-hidden="true" tabindex="-1"></a>Please note from here on out, ChatGPT gave us code that includes library calls and new code. The library calls are loaded above.</span>
-<span id="cb18-98"><a href="#cb18-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-99"><a href="#cb18-99" aria-hidden="true" tabindex="-1"></a>It first gave us back broken code because it did not understand fully the results of applying <span class="in">`clean_names()`</span> to the data.</span>
-<span id="cb18-100"><a href="#cb18-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-101"><a href="#cb18-101" aria-hidden="true" tabindex="-1"></a>We eventually sent it the following, explanining the data structure, after which it recovered:</span>
-<span id="cb18-102"><a href="#cb18-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-105"><a href="#cb18-105" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-106"><a href="#cb18-106" aria-hidden="true" tabindex="-1"></a>It wasn&#39;t working, so I did this (removed columns that broke the code)</span>
-<span id="cb18-107"><a href="#cb18-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-108"><a href="#cb18-108" aria-hidden="true" tabindex="-1"></a><span class="fu"># Clean and prepare</span></span>
-<span id="cb18-109"><a href="#cb18-109" aria-hidden="true" tabindex="-1"></a>clean_df &lt;- df |&gt;</span>
-<span id="cb18-110"><a href="#cb18-110" aria-hidden="true" tabindex="-1"></a>  clean_names() |&gt;</span>
-<span id="cb18-111"><a href="#cb18-111" aria-hidden="true" tabindex="-1"></a>  mutate(</span>
-<span id="cb18-112"><a href="#cb18-112" aria-hidden="true" tabindex="-1"></a>    vaccine = factor(vaccine),</span>
-<span id="cb18-113"><a href="#cb18-113" aria-hidden="true" tabindex="-1"></a>    geography_type = factor(geography_type),</span>
-<span id="cb18-114"><a href="#cb18-114" aria-hidden="true" tabindex="-1"></a>    geography = factor(geography),</span>
-<span id="cb18-115"><a href="#cb18-115" aria-hidden="true" tabindex="-1"></a>    season_survey_year = factor(season_survey_year),</span>
-<span id="cb18-116"><a href="#cb18-116" aria-hidden="true" tabindex="-1"></a>    dimension_type = factor(dimension_type),</span>
-<span id="cb18-117"><a href="#cb18-117" aria-hidden="true" tabindex="-1"></a>    dimension = factor(dimension)</span>
-<span id="cb18-118"><a href="#cb18-118" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-91"><a href="#cb18-91" aria-hidden="true" tabindex="-1"></a>We eventually sent it the following, explaining the data structure, after which it recovered:</span>
+<span id="cb18-92"><a href="#cb18-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-96"><a href="#cb18-96" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean and prepare</span></span>
+<span id="cb18-97"><a href="#cb18-97" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb18-98"><a href="#cb18-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span></span>
+<span id="cb18-99"><a href="#cb18-99" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb18-100"><a href="#cb18-100" aria-hidden="true" tabindex="-1"></a>    <span class="at">vaccine =</span> <span class="fu">factor</span>(vaccine),</span>
+<span id="cb18-101"><a href="#cb18-101" aria-hidden="true" tabindex="-1"></a>    <span class="at">geography_type =</span> <span class="fu">factor</span>(geography_type),</span>
+<span id="cb18-102"><a href="#cb18-102" aria-hidden="true" tabindex="-1"></a>    <span class="at">geography =</span> <span class="fu">factor</span>(geography),</span>
+<span id="cb18-103"><a href="#cb18-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">season_survey_year =</span> <span class="fu">factor</span>(season_survey_year),</span>
+<span id="cb18-104"><a href="#cb18-104" aria-hidden="true" tabindex="-1"></a>    <span class="at">dimension_type =</span> <span class="fu">factor</span>(dimension_type),</span>
+<span id="cb18-105"><a href="#cb18-105" aria-hidden="true" tabindex="-1"></a>    <span class="at">dimension =</span> <span class="fu">factor</span>(dimension),</span>
+<span id="cb18-106"><a href="#cb18-106" aria-hidden="true" tabindex="-1"></a>    <span class="at">estimate =</span> <span class="fu">as.numeric</span>(<span class="fu">str_replace</span>(estimate_percent, <span class="st">&quot;[^0-9.]&quot;</span>, <span class="st">&quot;&quot;</span>)),</span>
+<span id="cb18-107"><a href="#cb18-107" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_clean =</span> <span class="fu">str_remove</span>(x95_percent_ci_percent, <span class="st">&quot; ‡| †&quot;</span>),</span>
+<span id="cb18-108"><a href="#cb18-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_lower =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(ci_clean, <span class="st">&quot;^[0-9.]+&quot;</span>)),</span>
+<span id="cb18-109"><a href="#cb18-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_upper =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(ci_clean, <span class="st">&quot;[0-9.]+$&quot;</span>))</span>
+<span id="cb18-110"><a href="#cb18-110" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-111"><a href="#cb18-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-112"><a href="#cb18-112" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview result</span></span>
+<span id="cb18-113"><a href="#cb18-113" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(clean_df)</span>
+<span id="cb18-114"><a href="#cb18-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-115"><a href="#cb18-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-116"><a href="#cb18-116" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Summary</span></span>
+<span id="cb18-117"><a href="#cb18-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-118"><a href="#cb18-118" aria-hidden="true" tabindex="-1"></a>We then sent it this to inform it of the structure of the data, which is somewhat unusual:</span>
 <span id="cb18-119"><a href="#cb18-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-120"><a href="#cb18-120" aria-hidden="true" tabindex="-1"></a><span class="fu"># Preview result</span></span>
-<span id="cb18-121"><a href="#cb18-121" aria-hidden="true" tabindex="-1"></a>glimpse(clean_df)</span>
-<span id="cb18-122"><a href="#cb18-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-123"><a href="#cb18-123" aria-hidden="true" tabindex="-1"></a>and got back:</span>
-<span id="cb18-124"><a href="#cb18-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-125"><a href="#cb18-125" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; glimpse(clean_df)</span></span>
-<span id="cb18-126"><a href="#cb18-126" aria-hidden="true" tabindex="-1"></a><span class="at">Rows: 220,729</span></span>
-<span id="cb18-127"><a href="#cb18-127" aria-hidden="true" tabindex="-1"></a><span class="at">Columns: 11</span></span>
-<span id="cb18-128"><a href="#cb18-128" aria-hidden="true" tabindex="-1"></a><span class="at">$ vaccine                </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;Seasonal Influenza&quot;, &quot;…</span></span>
-<span id="cb18-129"><a href="#cb18-129" aria-hidden="true" tabindex="-1"></a><span class="at">$ geography_type         </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> Counties, Counties, Counties, Counties, Counties, Counties, States/Local Areas, States/Local Areas, States/Local Areas, States/Local …</span></span>
-<span id="cb18-130"><a href="#cb18-130" aria-hidden="true" tabindex="-1"></a><span class="at">$ geography              </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> New Haven, New Haven, New Haven, New Haven, New Haven, New Haven, New Jersey, New Jersey, New Jersey, New Jersey, New Jersey, New Jer…</span></span>
-<span id="cb18-131"><a href="#cb18-131" aria-hidden="true" tabindex="-1"></a><span class="at">$ fips                   </span><span class="dt">&lt;</span><span class="kw">chr</span><span class="dt">&gt;</span><span class="at"> &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;09009&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;34&quot;, &quot;…</span></span>
-<span id="cb18-132"><a href="#cb18-132" aria-hidden="true" tabindex="-1"></a><span class="at">$ season_survey_year     </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> 2018, 2021, 2020, 2021, 2018, 2019, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10, 2009-10…</span></span>
-<span id="cb18-133"><a href="#cb18-133" aria-hidden="true" tabindex="-1"></a><span class="at">$ month                  </span><span class="dt">&lt;</span><span class="kw">dbl</span><span class="dt">&gt;</span><span class="at"> 1, 1, 1, 1, 1, 1, 5, 4, 11, 10, 9, 8, 9, 1, 12, 11, 10, 3, 2, 5, 4, 3, 2, 1, 12, 5, 5, 4, 3, 2, 12, 5, 8, 4, 3, 2, 1, 12, 11, 10, 9, …</span></span>
-<span id="cb18-134"><a href="#cb18-134" aria-hidden="true" tabindex="-1"></a><span class="at">$ dimension_type         </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &gt;=18 Years, &gt;=18 Years, Age, Age, Age, Age, Race and Ethnicity, Race and Ethnicity, Race and Ethnicity, Race and Ethnicity, Race and …</span></span>
-<span id="cb18-135"><a href="#cb18-135" aria-hidden="true" tabindex="-1"></a><span class="at">$ dimension              </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &quot;Non-Medical Setting&quot;, &quot;Non-Medical Setting&quot;, &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;&gt;=18 Years&quot;, &quot;American Indian or Alaska Nati…</span></span>
-<span id="cb18-136"><a href="#cb18-136" aria-hidden="true" tabindex="-1"></a><span class="at">$ estimate_percent       </span><span class="dt">&lt;</span><span class="kw">chr</span><span class="dt">&gt;</span><span class="at"> &quot;45.5&quot;, &quot;53.0&quot;, &quot;52.4&quot;, &quot;50.2&quot;, &quot;34.0&quot;, &quot;49.5&quot;, &quot;57.7&quot;, &quot;57.7&quot;, &quot;34.7&quot;, &quot;24.8&quot;, &quot;10.8&quot;, &quot;NR †&quot;, &quot;NR †&quot;, &quot;57.7&quot;, &quot;54.8&quot;, &quot;44.4&quot;, &quot;NR †…</span></span>
-<span id="cb18-137"><a href="#cb18-137" aria-hidden="true" tabindex="-1"></a><span class="at">$ x95_percent_ci_percent </span><span class="dt">&lt;</span><span class="kw">chr</span><span class="dt">&gt;</span><span class="at"> &quot;43.9 to 47.2&quot;, &quot;46.0 to 60.9&quot;, &quot;50.6 to 54.3&quot;, &quot;45.4 to 55.8&quot;, &quot;32.6 to 35.5&quot;, &quot;47.8 to 51.3&quot;, &quot;40.2 to 75.2 ‡&quot;, &quot;40.2 to 75.2 ‡&quot;, &quot;…</span></span>
-<span id="cb18-138"><a href="#cb18-138" aria-hidden="true" tabindex="-1"></a><span class="at">$ sample_size            </span><span class="dt">&lt;</span><span class="kw">dbl</span><span class="dt">&gt;</span><span class="at"> NA, NA, NA, NA, NA, NA, 48, 48, 552, 552, 552, 552, 48, 48, 48, 48, 48, 48, 48, 2554, 2554, 2554, 2554, 2554, 2554, 8306, 3107, 3107,…</span></span>
-<span id="cb18-139"><a href="#cb18-139" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span></span>
+<span id="cb18-122"><a href="#cb18-122" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-123"><a href="#cb18-123" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(clean_df<span class="sc">$</span>dimension)</span>
+<span id="cb18-124"><a href="#cb18-124" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(clean_df<span class="sc">$</span>dimension_type)</span>
+<span id="cb18-125"><a href="#cb18-125" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-126"><a href="#cb18-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-127"><a href="#cb18-127" aria-hidden="true" tabindex="-1"></a>Here is what we have:</span>
+<span id="cb18-128"><a href="#cb18-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-129"><a href="#cb18-129" aria-hidden="true" tabindex="-1"></a>Please notice that the age categories have overlap, so it&#39;s clear that these data are pre-aggregated, and we&#39;ll want to make sure we use mutually exclusive categories.</span>
+<span id="cb18-130"><a href="#cb18-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-131"><a href="#cb18-131" aria-hidden="true" tabindex="-1"></a>Here is what we want:</span>
+<span id="cb18-132"><a href="#cb18-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-133"><a href="#cb18-133" aria-hidden="true" tabindex="-1"></a>We want to create a time series that shows the vaccination rate, by age, over time.</span>
+<span id="cb18-134"><a href="#cb18-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-135"><a href="#cb18-135" aria-hidden="true" tabindex="-1"></a>Before you give me code, what do you recommend?</span>
+<span id="cb18-136"><a href="#cb18-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-137"><a href="#cb18-137" aria-hidden="true" tabindex="-1"></a>It went over challenges and recommendations.</span>
+<span id="cb18-138"><a href="#cb18-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-139"><a href="#cb18-139" aria-hidden="true" tabindex="-1"></a>We then asked it:</span>
 <span id="cb18-140"><a href="#cb18-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-141"><a href="#cb18-141" aria-hidden="true" tabindex="-1"></a>try again</span>
-<span id="cb18-142"><a href="#cb18-142" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-143"><a href="#cb18-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-144"><a href="#cb18-144" aria-hidden="true" tabindex="-1"></a>This context helped if finds its way and we ended up with the following code block:</span>
-<span id="cb18-145"><a href="#cb18-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-146"><a href="#cb18-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-149"><a href="#cb18-149" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-150"><a href="#cb18-150" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb18-151"><a href="#cb18-151" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb18-152"><a href="#cb18-152" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-153"><a href="#cb18-153" aria-hidden="true" tabindex="-1"></a><span class="co"># Clean and prepare</span></span>
-<span id="cb18-154"><a href="#cb18-154" aria-hidden="true" tabindex="-1"></a>clean_df <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
-<span id="cb18-155"><a href="#cb18-155" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span></span>
-<span id="cb18-156"><a href="#cb18-156" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb18-157"><a href="#cb18-157" aria-hidden="true" tabindex="-1"></a>    <span class="at">vaccine =</span> <span class="fu">factor</span>(vaccine),</span>
-<span id="cb18-158"><a href="#cb18-158" aria-hidden="true" tabindex="-1"></a>    <span class="at">geography_type =</span> <span class="fu">factor</span>(geography_type),</span>
-<span id="cb18-159"><a href="#cb18-159" aria-hidden="true" tabindex="-1"></a>    <span class="at">geography =</span> <span class="fu">factor</span>(geography),</span>
-<span id="cb18-160"><a href="#cb18-160" aria-hidden="true" tabindex="-1"></a>    <span class="at">season_survey_year =</span> <span class="fu">factor</span>(season_survey_year),</span>
-<span id="cb18-161"><a href="#cb18-161" aria-hidden="true" tabindex="-1"></a>    <span class="at">dimension_type =</span> <span class="fu">factor</span>(dimension_type),</span>
-<span id="cb18-162"><a href="#cb18-162" aria-hidden="true" tabindex="-1"></a>    <span class="at">dimension =</span> <span class="fu">factor</span>(dimension),</span>
-<span id="cb18-163"><a href="#cb18-163" aria-hidden="true" tabindex="-1"></a>     <span class="at">estimate =</span> <span class="fu">as.numeric</span>(<span class="fu">str_replace</span>(estimate_percent, <span class="st">&quot;[^0-9.]&quot;</span>, <span class="st">&quot;&quot;</span>)),</span>
-<span id="cb18-164"><a href="#cb18-164" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_clean =</span> <span class="fu">str_remove</span>(x95_percent_ci_percent, <span class="st">&quot; ‡| †&quot;</span>),</span>
-<span id="cb18-165"><a href="#cb18-165" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_lower =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(ci_clean, <span class="st">&quot;^[0-9.]+&quot;</span>)),</span>
-<span id="cb18-166"><a href="#cb18-166" aria-hidden="true" tabindex="-1"></a>    <span class="at">ci_upper =</span> <span class="fu">as.numeric</span>(<span class="fu">str_extract</span>(ci_clean, <span class="st">&quot;[0-9.]+$&quot;</span>))</span>
-<span id="cb18-167"><a href="#cb18-167" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb18-168"><a href="#cb18-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-169"><a href="#cb18-169" aria-hidden="true" tabindex="-1"></a><span class="co"># Preview result</span></span>
-<span id="cb18-170"><a href="#cb18-170" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(clean_df)</span>
+<span id="cb18-141"><a href="#cb18-141" aria-hidden="true" tabindex="-1"></a>&quot;OK, give me that dataframe before we visualize&quot;</span>
+<span id="cb18-142"><a href="#cb18-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-145"><a href="#cb18-145" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-146"><a href="#cb18-146" aria-hidden="true" tabindex="-1"></a>mutually_exclusive_ages <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb18-147"><a href="#cb18-147" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;6 Months - 4 Years&quot;</span>,</span>
+<span id="cb18-148"><a href="#cb18-148" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;5-12 Years&quot;</span>,</span>
+<span id="cb18-149"><a href="#cb18-149" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;13-17 Years&quot;</span>,</span>
+<span id="cb18-150"><a href="#cb18-150" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;18-49 Years&quot;</span>,</span>
+<span id="cb18-151"><a href="#cb18-151" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;50-64 Years&quot;</span>,</span>
+<span id="cb18-152"><a href="#cb18-152" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;&gt;=65 Years&quot;</span></span>
+<span id="cb18-153"><a href="#cb18-153" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-154"><a href="#cb18-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-155"><a href="#cb18-155" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the cleaned time series dataframe</span></span>
+<span id="cb18-156"><a href="#cb18-156" aria-hidden="true" tabindex="-1"></a>age_time_series <span class="ot">&lt;-</span> clean_df <span class="sc">|&gt;</span></span>
+<span id="cb18-157"><a href="#cb18-157" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb18-158"><a href="#cb18-158" aria-hidden="true" tabindex="-1"></a>    dimension_type <span class="sc">==</span> <span class="st">&quot;Age&quot;</span>,</span>
+<span id="cb18-159"><a href="#cb18-159" aria-hidden="true" tabindex="-1"></a>    dimension <span class="sc">%in%</span> mutually_exclusive_ages,</span>
+<span id="cb18-160"><a href="#cb18-160" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">is.na</span>(estimate)</span>
+<span id="cb18-161"><a href="#cb18-161" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-162"><a href="#cb18-162" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(season_survey_year, <span class="at">age_group =</span> dimension) <span class="sc">|&gt;</span></span>
+<span id="cb18-163"><a href="#cb18-163" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb18-164"><a href="#cb18-164" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_estimate =</span> <span class="fu">mean</span>(estimate, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb18-165"><a href="#cb18-165" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_records =</span> <span class="fu">n</span>(),</span>
+<span id="cb18-166"><a href="#cb18-166" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb18-167"><a href="#cb18-167" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb18-168"><a href="#cb18-168" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb18-169"><a href="#cb18-169" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_group =</span> <span class="fu">fct_relevel</span>(age_group, mutually_exclusive_ages)</span>
+<span id="cb18-170"><a href="#cb18-170" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb18-171"><a href="#cb18-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-172"><a href="#cb18-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-173"><a href="#cb18-173" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-174"><a href="#cb18-174" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Summary</span></span>
+<span id="cb18-172"><a href="#cb18-172" aria-hidden="true" tabindex="-1"></a><span class="co"># View the resulting structure</span></span>
+<span id="cb18-173"><a href="#cb18-173" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(age_time_series)</span>
+<span id="cb18-174"><a href="#cb18-174" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb18-175"><a href="#cb18-175" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-176"><a href="#cb18-176" aria-hidden="true" tabindex="-1"></a>We then sent it this to inform it of the structure of the data, which is somewhat unusual.</span>
+<span id="cb18-176"><a href="#cb18-176" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Visualization</span></span>
 <span id="cb18-177"><a href="#cb18-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-180"><a href="#cb18-180" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-181"><a href="#cb18-181" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; table(clean_df$dimension)</span></span>
-<span id="cb18-182"><a href="#cb18-182" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-183"><a href="#cb18-183" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">&gt;=18 Years                                              &gt;=6 Months </span></span>
-<span id="cb18-184"><a href="#cb18-184" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  26534                                                   10449 </span></span>
-<span id="cb18-185"><a href="#cb18-185" aria-hidden="true" tabindex="-1"></a><span class="at">                                             &gt;=65 Years                                             13-17 Years </span></span>
-<span id="cb18-186"><a href="#cb18-186" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  10903                                                   10265 </span></span>
-<span id="cb18-187"><a href="#cb18-187" aria-hidden="true" tabindex="-1"></a><span class="at">                                            18-49 Years                                18-49 Years at High Risk </span></span>
-<span id="cb18-188"><a href="#cb18-188" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   9931                                                   11038 </span></span>
-<span id="cb18-189"><a href="#cb18-189" aria-hidden="true" tabindex="-1"></a><span class="at">                           18-49 Years not at High Risk                                             18-64 Years </span></span>
-<span id="cb18-190"><a href="#cb18-190" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   9257                                                    9942 </span></span>
-<span id="cb18-191"><a href="#cb18-191" aria-hidden="true" tabindex="-1"></a><span class="at">                               18-64 Years at High Risk                            18-64 Years not at High Risk </span></span>
-<span id="cb18-192"><a href="#cb18-192" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   9898                                                    8018 </span></span>
-<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a><span class="at">                               25-64 Years at High Risk                 25-64 Years not in Initial Target Group </span></span>
-<span id="cb18-194"><a href="#cb18-194" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    496                                                     496 </span></span>
-<span id="cb18-195"><a href="#cb18-195" aria-hidden="true" tabindex="-1"></a><span class="at">                                             5-12 Years                                             50-64 Years </span></span>
-<span id="cb18-196"><a href="#cb18-196" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  10279                                                   11125 </span></span>
-<span id="cb18-197"><a href="#cb18-197" aria-hidden="true" tabindex="-1"></a><span class="at">                                    6 Months - 17 Years                                      6 Months - 4 Years </span></span>
-<span id="cb18-198"><a href="#cb18-198" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  12018                                                   10282 </span></span>
-<span id="cb18-199"><a href="#cb18-199" aria-hidden="true" tabindex="-1"></a><span class="at">6 Months - 64 Years at High Risk (Initial Target Group)          American Indian or Alaska Native, Non-Hispanic </span></span>
-<span id="cb18-200"><a href="#cb18-200" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    496                                                    1702 </span></span>
-<span id="cb18-201"><a href="#cb18-201" aria-hidden="true" tabindex="-1"></a><span class="at">                                    Asian, Non-Hispanic                                     Black, Non-Hispanic </span></span>
-<span id="cb18-202"><a href="#cb18-202" aria-hidden="true" tabindex="-1"></a><span class="at">                                                   1712                                                   11067 </span></span>
-<span id="cb18-203"><a href="#cb18-203" aria-hidden="true" tabindex="-1"></a><span class="at">                                             Greater 65                               Greater than 18 Years flu </span></span>
-<span id="cb18-204"><a href="#cb18-204" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    770                                                     770 </span></span>
-<span id="cb18-205"><a href="#cb18-205" aria-hidden="true" tabindex="-1"></a><span class="at">                              Greater than 6 Months flu                                                Hispanic </span></span>
-<span id="cb18-206"><a href="#cb18-206" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    682                                                   11106 </span></span>
-<span id="cb18-207"><a href="#cb18-207" aria-hidden="true" tabindex="-1"></a><span class="at">                                        Medical Setting                                     Non-Medical Setting </span></span>
-<span id="cb18-208"><a href="#cb18-208" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    770                                                    6975 </span></span>
-<span id="cb18-209"><a href="#cb18-209" aria-hidden="true" tabindex="-1"></a><span class="at">                  Other or Multiple Races, Non-Hispanic                                          Pharmacy/Store </span></span>
-<span id="cb18-210"><a href="#cb18-210" aria-hidden="true" tabindex="-1"></a><span class="at">                                                  11093                                                     770 </span></span>
-<span id="cb18-211"><a href="#cb18-211" aria-hidden="true" tabindex="-1"></a><span class="at">                                                 School                                     White, Non-Hispanic </span></span>
-<span id="cb18-212"><a href="#cb18-212" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    198                                                   11115 </span></span>
-<span id="cb18-213"><a href="#cb18-213" aria-hidden="true" tabindex="-1"></a><span class="at">                                              Workplace </span></span>
-<span id="cb18-214"><a href="#cb18-214" aria-hidden="true" tabindex="-1"></a><span class="at">                                                    572 </span></span>
-<span id="cb18-215"><a href="#cb18-215" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; table(clean_df$dimension_type)</span></span>
-<span id="cb18-216"><a href="#cb18-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-217"><a href="#cb18-217" aria-hidden="true" tabindex="-1"></a>         <span class="at">&gt;=18 Years          &gt;=65 Years         18-49 Years         18-64 Years         50-64 Years 6 Months - 17 Years                 Age  Race and Ethnicity </span></span>
-<span id="cb18-218"><a href="#cb18-218" aria-hidden="true" tabindex="-1"></a><span class="at">               6829                 416                 416                 416                 416                 792              163649               47795 </span></span>
-<span id="cb18-219"><a href="#cb18-219" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-220"><a href="#cb18-220" aria-hidden="true" tabindex="-1"></a>I tabulated the dimensions, and this is what you get.   Can you give me summarize code to make more sense of this that i can put in a notebook?</span>
-<span id="cb18-221"><a href="#cb18-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-222"><a href="#cb18-222" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-223"><a href="#cb18-223" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-224"><a href="#cb18-224" aria-hidden="true" tabindex="-1"></a>It returned us the following:</span>
-<span id="cb18-225"><a href="#cb18-225" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-226"><a href="#cb18-226" aria-hidden="true" tabindex="-1"></a><span class="in">```{r summarize_dimensions}</span></span>
-<span id="cb18-227"><a href="#cb18-227" aria-hidden="true" tabindex="-1"></a>dimension_type_summary <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb18-228"><a href="#cb18-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(dimension_type, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span>                       <span class="co"># tally rows</span></span>
-<span id="cb18-229"><a href="#cb18-229" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span>                                        <span class="co"># largest first</span></span>
-<span id="cb18-230"><a href="#cb18-230" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">percent_of_total =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n))                       <span class="co"># share of entire data set</span></span>
-<span id="cb18-231"><a href="#cb18-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-232"><a href="#cb18-232" aria-hidden="true" tabindex="-1"></a><span class="do">## 2 ── full breakdown: every dimension within each type -----------------------</span></span>
-<span id="cb18-233"><a href="#cb18-233" aria-hidden="true" tabindex="-1"></a>dimension_breakdown <span class="ot">&lt;-</span> clean_df <span class="sc">%&gt;%</span> </span>
-<span id="cb18-234"><a href="#cb18-234" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(dimension_type, dimension, <span class="at">name =</span> <span class="st">&quot;n&quot;</span>) <span class="sc">%&gt;%</span>            <span class="co"># tally rows</span></span>
-<span id="cb18-235"><a href="#cb18-235" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(dimension_type) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-236"><a href="#cb18-236" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb18-237"><a href="#cb18-237" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_within_type =</span> n <span class="sc">/</span> <span class="fu">sum</span>(n),                         <span class="co"># share inside the parent type</span></span>
-<span id="cb18-238"><a href="#cb18-238" aria-hidden="true" tabindex="-1"></a>    <span class="at">rank_within_type   =</span> <span class="fu">dense_rank</span>(<span class="fu">desc</span>(n))                  <span class="co"># rank for convenience</span></span>
-<span id="cb18-239"><a href="#cb18-239" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-240"><a href="#cb18-240" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(dimension_type, <span class="fu">desc</span>(n)) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-241"><a href="#cb18-241" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
-<span id="cb18-242"><a href="#cb18-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-243"><a href="#cb18-243" aria-hidden="true" tabindex="-1"></a><span class="do">## (optional) keep only the 5 largest dimensions per type ----------------------</span></span>
-<span id="cb18-244"><a href="#cb18-244" aria-hidden="true" tabindex="-1"></a>top5_breakdown <span class="ot">&lt;-</span> dimension_breakdown <span class="sc">%&gt;%</span> </span>
-<span id="cb18-245"><a href="#cb18-245" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(rank_within_type <span class="sc">&lt;=</span> <span class="dv">5</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-246"><a href="#cb18-246" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>rank_within_type)                                   <span class="co"># drop helper column</span></span>
-<span id="cb18-247"><a href="#cb18-247" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-248"><a href="#cb18-248" aria-hidden="true" tabindex="-1"></a><span class="do">## ── Quick display ------------------------------------------------------------</span></span>
-<span id="cb18-249"><a href="#cb18-249" aria-hidden="true" tabindex="-1"></a>dimension_type_summary <span class="sc">%&gt;%</span> </span>
-<span id="cb18-250"><a href="#cb18-250" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">&quot;Records by dimension_type&quot;</span>)</span>
-<span id="cb18-251"><a href="#cb18-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-252"><a href="#cb18-252" aria-hidden="true" tabindex="-1"></a>top5_breakdown <span class="sc">%&gt;%</span> </span>
-<span id="cb18-253"><a href="#cb18-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">&quot;Top-5 dimensions within each dimension_type&quot;</span>)</span>
-<span id="cb18-254"><a href="#cb18-254" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-255"><a href="#cb18-255" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-256"><a href="#cb18-256" aria-hidden="true" tabindex="-1"></a>I then gave if this response:</span>
-<span id="cb18-257"><a href="#cb18-257" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-260"><a href="#cb18-260" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-261"><a href="#cb18-261" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; # Display top 10 per type (optional, remove if you want all)</span></span>
-<span id="cb18-262"><a href="#cb18-262" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; dimension_summary </span><span class="pp">|</span><span class="at">&gt;</span></span>
-<span id="cb18-263"><a href="#cb18-263" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>group_by(dimension_type) |&gt;</span>
-<span id="cb18-264"><a href="#cb18-264" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>slice_head(n = 10) |&gt;</span>
-<span id="cb18-265"><a href="#cb18-265" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>ungroup() |&gt;</span>
-<span id="cb18-266"><a href="#cb18-266" aria-hidden="true" tabindex="-1"></a><span class="ss">+   </span>knitr::kable()</span>
-<span id="cb18-267"><a href="#cb18-267" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-268"><a href="#cb18-268" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>dimension_type      <span class="pp">|</span>dimension                                      <span class="pp">|</span>     n<span class="pp">|</span></span>
-<span id="cb18-269"><a href="#cb18-269" aria-hidden="true" tabindex="-1"></a><span class="pp">|:-------------------|:----------------------------------------------|-----:|</span></span>
-<span id="cb18-270"><a href="#cb18-270" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>  6361<span class="pp">|</span></span>
-<span id="cb18-271"><a href="#cb18-271" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   156<span class="pp">|</span></span>
-<span id="cb18-272"><a href="#cb18-272" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   156<span class="pp">|</span></span>
-<span id="cb18-273"><a href="#cb18-273" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=18 Years          <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   156<span class="pp">|</span></span>
-<span id="cb18-274"><a href="#cb18-274" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-275"><a href="#cb18-275" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-276"><a href="#cb18-276" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-277"><a href="#cb18-277" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>&gt;=65 Years          <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-278"><a href="#cb18-278" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-279"><a href="#cb18-279" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-280"><a href="#cb18-280" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-281"><a href="#cb18-281" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-49 Years         <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-282"><a href="#cb18-282" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-283"><a href="#cb18-283" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-284"><a href="#cb18-284" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-285"><a href="#cb18-285" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>18-64 Years         <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-286"><a href="#cb18-286" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-287"><a href="#cb18-287" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-288"><a href="#cb18-288" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-289"><a href="#cb18-289" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>50-64 Years         <span class="pp">|</span>Workplace                                      <span class="pp">|</span>   104<span class="pp">|</span></span>
-<span id="cb18-290"><a href="#cb18-290" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>Medical Setting                                <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb18-291"><a href="#cb18-291" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>Non-Medical Setting                            <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb18-292"><a href="#cb18-292" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>Pharmacy/Store                                 <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb18-293"><a href="#cb18-293" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>6 Months - 17 Years <span class="pp">|</span>School                                         <span class="pp">|</span>   198<span class="pp">|</span></span>
-<span id="cb18-294"><a href="#cb18-294" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>&gt;=18 Years                                     <span class="pp">|</span> 26534<span class="pp">|</span></span>
-<span id="cb18-295"><a href="#cb18-295" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>6 Months - 17 Years                            <span class="pp">|</span> 12018<span class="pp">|</span></span>
-<span id="cb18-296"><a href="#cb18-296" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>50-64 Years                                    <span class="pp">|</span> 11125<span class="pp">|</span></span>
-<span id="cb18-297"><a href="#cb18-297" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>18-49 Years at High Risk                       <span class="pp">|</span> 11038<span class="pp">|</span></span>
-<span id="cb18-298"><a href="#cb18-298" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>&gt;=65 Years                                     <span class="pp">|</span> 10903<span class="pp">|</span></span>
-<span id="cb18-299"><a href="#cb18-299" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>&gt;=6 Months                                     <span class="pp">|</span> 10449<span class="pp">|</span></span>
-<span id="cb18-300"><a href="#cb18-300" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>6 Months - 4 Years                             <span class="pp">|</span> 10282<span class="pp">|</span></span>
-<span id="cb18-301"><a href="#cb18-301" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>5-12 Years                                     <span class="pp">|</span> 10279<span class="pp">|</span></span>
-<span id="cb18-302"><a href="#cb18-302" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>13-17 Years                                    <span class="pp">|</span> 10265<span class="pp">|</span></span>
-<span id="cb18-303"><a href="#cb18-303" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Age                 <span class="pp">|</span>18-64 Years                                    <span class="pp">|</span>  9942<span class="pp">|</span></span>
-<span id="cb18-304"><a href="#cb18-304" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>White, Non-Hispanic                            <span class="pp">|</span> 11115<span class="pp">|</span></span>
-<span id="cb18-305"><a href="#cb18-305" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Hispanic                                       <span class="pp">|</span> 11106<span class="pp">|</span></span>
-<span id="cb18-306"><a href="#cb18-306" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Other or Multiple Races, Non-Hispanic          <span class="pp">|</span> 11093<span class="pp">|</span></span>
-<span id="cb18-307"><a href="#cb18-307" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Black, Non-Hispanic                            <span class="pp">|</span> 11067<span class="pp">|</span></span>
-<span id="cb18-308"><a href="#cb18-308" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>Asian, Non-Hispanic                            <span class="pp">|</span>  1712<span class="pp">|</span></span>
-<span id="cb18-309"><a href="#cb18-309" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>Race and Ethnicity  <span class="pp">|</span>American Indian or Alaska Native, Non-Hispanic <span class="pp">|</span>  1702<span class="pp">|</span></span>
-<span id="cb18-310"><a href="#cb18-310" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-311"><a href="#cb18-311" aria-hidden="true" tabindex="-1"></a>Here is what I have:</span>
-<span id="cb18-312"><a href="#cb18-312" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-313"><a href="#cb18-313" aria-hidden="true" tabindex="-1"></a>Please notice that the age categories have overlap, so it&#39;s clear that these data are pre-aggregated, and we&#39;ll want to make sure we use mutually exclusive categories</span>
-<span id="cb18-314"><a href="#cb18-314" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-315"><a href="#cb18-315" aria-hidden="true" tabindex="-1"></a>Here is what I want:</span>
-<span id="cb18-316"><a href="#cb18-316" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-317"><a href="#cb18-317" aria-hidden="true" tabindex="-1"></a>I want to create a time series that shows the vacciation rate, by age, over time</span>
-<span id="cb18-318"><a href="#cb18-318" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-319"><a href="#cb18-319" aria-hidden="true" tabindex="-1"></a>Before you give me code, what do you reccomend</span>
-<span id="cb18-320"><a href="#cb18-320" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-321"><a href="#cb18-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-322"><a href="#cb18-322" aria-hidden="true" tabindex="-1"></a>It went over challenges and recommendations.</span>
-<span id="cb18-323"><a href="#cb18-323" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-324"><a href="#cb18-324" aria-hidden="true" tabindex="-1"></a>We then asked it:</span>
-<span id="cb18-325"><a href="#cb18-325" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-326"><a href="#cb18-326" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-327"><a href="#cb18-327" aria-hidden="true" tabindex="-1"></a>OK, give me that dataframe before we visualize</span>
-<span id="cb18-328"><a href="#cb18-328" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-329"><a href="#cb18-329" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-332"><a href="#cb18-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-333"><a href="#cb18-333" aria-hidden="true" tabindex="-1"></a><span class="in">mutually_exclusive_ages &lt;- c(</span></span>
-<span id="cb18-334"><a href="#cb18-334" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;6 Months - 4 Years&quot;,</span></span>
-<span id="cb18-335"><a href="#cb18-335" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;5-12 Years&quot;,</span></span>
-<span id="cb18-336"><a href="#cb18-336" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;13-17 Years&quot;,</span></span>
-<span id="cb18-337"><a href="#cb18-337" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;18-49 Years&quot;,</span></span>
-<span id="cb18-338"><a href="#cb18-338" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;50-64 Years&quot;,</span></span>
-<span id="cb18-339"><a href="#cb18-339" aria-hidden="true" tabindex="-1"></a><span class="in">  &quot;&gt;=65 Years&quot;</span></span>
-<span id="cb18-340"><a href="#cb18-340" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
-<span id="cb18-341"><a href="#cb18-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-342"><a href="#cb18-342" aria-hidden="true" tabindex="-1"></a><span class="in"># Build the cleaned time series dataframe</span></span>
-<span id="cb18-343"><a href="#cb18-343" aria-hidden="true" tabindex="-1"></a><span class="in">age_time_series &lt;- clean_df |&gt;</span></span>
-<span id="cb18-344"><a href="#cb18-344" aria-hidden="true" tabindex="-1"></a><span class="in">  filter(</span></span>
-<span id="cb18-345"><a href="#cb18-345" aria-hidden="true" tabindex="-1"></a><span class="in">    dimension_type == &quot;Age&quot;,</span></span>
-<span id="cb18-346"><a href="#cb18-346" aria-hidden="true" tabindex="-1"></a><span class="in">    dimension %in% mutually_exclusive_ages,</span></span>
-<span id="cb18-347"><a href="#cb18-347" aria-hidden="true" tabindex="-1"></a><span class="in">    !is.na(estimate)</span></span>
-<span id="cb18-348"><a href="#cb18-348" aria-hidden="true" tabindex="-1"></a><span class="in">  ) |&gt;</span></span>
-<span id="cb18-349"><a href="#cb18-349" aria-hidden="true" tabindex="-1"></a><span class="in">  group_by(season_survey_year, age_group = dimension) |&gt;</span></span>
-<span id="cb18-350"><a href="#cb18-350" aria-hidden="true" tabindex="-1"></a><span class="in">  summarise(</span></span>
-<span id="cb18-351"><a href="#cb18-351" aria-hidden="true" tabindex="-1"></a><span class="in">    mean_estimate = mean(estimate, na.rm = TRUE),</span></span>
-<span id="cb18-352"><a href="#cb18-352" aria-hidden="true" tabindex="-1"></a><span class="in">    n_records = n(),</span></span>
-<span id="cb18-353"><a href="#cb18-353" aria-hidden="true" tabindex="-1"></a><span class="in">    .groups = &quot;drop&quot;</span></span>
-<span id="cb18-354"><a href="#cb18-354" aria-hidden="true" tabindex="-1"></a><span class="in">  ) |&gt;</span></span>
-<span id="cb18-355"><a href="#cb18-355" aria-hidden="true" tabindex="-1"></a><span class="in">  mutate(</span></span>
-<span id="cb18-356"><a href="#cb18-356" aria-hidden="true" tabindex="-1"></a><span class="in">    age_group = fct_relevel(age_group, mutually_exclusive_ages)</span></span>
-<span id="cb18-357"><a href="#cb18-357" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
-<span id="cb18-358"><a href="#cb18-358" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-359"><a href="#cb18-359" aria-hidden="true" tabindex="-1"></a><span class="in"># View the resulting structure</span></span>
-<span id="cb18-360"><a href="#cb18-360" aria-hidden="true" tabindex="-1"></a><span class="in">glimpse(age_time_series)</span></span>
-<span id="cb18-361"><a href="#cb18-361" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-362"><a href="#cb18-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-363"><a href="#cb18-363" aria-hidden="true" tabindex="-1"></a>I responded:</span>
-<span id="cb18-364"><a href="#cb18-364" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-367"><a href="#cb18-367" aria-hidden="true" tabindex="-1"></a><span class="in">```{markdown}</span></span>
-<span id="cb18-368"><a href="#cb18-368" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; glimpse(age_time_series)</span></span>
-<span id="cb18-369"><a href="#cb18-369" aria-hidden="true" tabindex="-1"></a><span class="at">Rows: 85</span></span>
-<span id="cb18-370"><a href="#cb18-370" aria-hidden="true" tabindex="-1"></a><span class="at">Columns: 4</span></span>
-<span id="cb18-371"><a href="#cb18-371" aria-hidden="true" tabindex="-1"></a><span class="at">$ season_survey_year </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> 2009-10, 2009-10, 2010-11, 2010-11, 2010-11, 2010-11, 2010-11, 2010-11, 2011-12, 2011-12, 2011-12, 2011-12, 2011-12, 2011-12, 2012-13, 20…</span></span>
-<span id="cb18-372"><a href="#cb18-372" aria-hidden="true" tabindex="-1"></a><span class="at">$ age_group          </span><span class="dt">&lt;</span><span class="kw">fct</span><span class="dt">&gt;</span><span class="at"> &quot;&gt;=65 Years&quot;, &quot;50-64 Years&quot;, &quot;&gt;=65 Years&quot;, &quot;13-17 Years&quot;, &quot;18-49 Years&quot;, &quot;5-12 Years&quot;, &quot;50-64 Years&quot;, &quot;6 Months - 4 Years&quot;, &quot;&gt;=65 Years&quot;,…</span></span>
-<span id="cb18-373"><a href="#cb18-373" aria-hidden="true" tabindex="-1"></a><span class="at">$ mean_estimate      </span><span class="dt">&lt;</span><span class="kw">dbl</span><span class="dt">&gt;</span><span class="at"> 46.28232, 38.60872, 52.04114, 30.16828, 25.02017, 43.74000, 35.90828, 51.23814, 51.03056, 28.14342, 23.20322, 43.89715, 33.89848, 54.0487…</span></span>
-<span id="cb18-374"><a href="#cb18-374" aria-hidden="true" tabindex="-1"></a><span class="at">$ n_records          </span><span class="dt">&lt;</span><span class="kw">int</span><span class="dt">&gt;</span><span class="at"> 1680, 1158, 598, 558, 575, 585, 580, 582, 602, 562, 590, 596, 592, 580, 614, 583, 606, 626, 607, 618, 603, 588, 592, 639, 590, 627, 616, …</span></span>
-<span id="cb18-375"><a href="#cb18-375" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; </span></span>
-<span id="cb18-376"><a href="#cb18-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-377"><a href="#cb18-377" aria-hidden="true" tabindex="-1"></a>give me four lines for each group, annotated, by year</span>
-<span id="cb18-378"><a href="#cb18-378" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-379"><a href="#cb18-379" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-380"><a href="#cb18-380" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Visualization</span></span>
-<span id="cb18-381"><a href="#cb18-381" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-382"><a href="#cb18-382" aria-hidden="true" tabindex="-1"></a>With the data now prepared and us asking for a line plot broken apart by age group, it gave us the following code, which worked the first time.</span>
-<span id="cb18-383"><a href="#cb18-383" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-386"><a href="#cb18-386" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb18-387"><a href="#cb18-387" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(age_time_series, <span class="fu">aes</span>(<span class="at">x =</span> season_survey_year, <span class="at">y =</span> mean_estimate, <span class="at">group =</span> age_group, <span class="at">color =</span> age_group)) <span class="sc">+</span></span>
-<span id="cb18-388"><a href="#cb18-388" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb18-389"><a href="#cb18-389" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb18-390"><a href="#cb18-390" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb18-391"><a href="#cb18-391" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Influenza Vaccination Coverage Over Time by Age Group&quot;</span>,</span>
-<span id="cb18-392"><a href="#cb18-392" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Season/Survey Year&quot;</span>,</span>
-<span id="cb18-393"><a href="#cb18-393" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Mean Vaccination Estimate (%)&quot;</span>,</span>
-<span id="cb18-394"><a href="#cb18-394" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Age Group&quot;</span></span>
-<span id="cb18-395"><a href="#cb18-395" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb18-396"><a href="#cb18-396" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
-<span id="cb18-397"><a href="#cb18-397" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb18-398"><a href="#cb18-398" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
-<span id="cb18-399"><a href="#cb18-399" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span></span>
-<span id="cb18-400"><a href="#cb18-400" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb18-401"><a href="#cb18-401" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-402"><a href="#cb18-402" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-403"><a href="#cb18-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-404"><a href="#cb18-404" aria-hidden="true" tabindex="-1"></a>This image needs refinement, which ChatGPT would happily provide if we continued, but it worked. We wrote zero code ourselves.</span>
+<span id="cb18-178"><a href="#cb18-178" aria-hidden="true" tabindex="-1"></a>With the data now prepared and us asking for a line plot broken apart by age group, it gave us the following code, which worked the first time:</span>
+<span id="cb18-179"><a href="#cb18-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-182"><a href="#cb18-182" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb18-183"><a href="#cb18-183" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(age_time_series, <span class="fu">aes</span>(<span class="at">x =</span> season_survey_year, <span class="at">y =</span> mean_estimate, <span class="at">group =</span> age_group, <span class="at">color =</span> age_group)) <span class="sc">+</span></span>
+<span id="cb18-184"><a href="#cb18-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb18-185"><a href="#cb18-185" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb18-186"><a href="#cb18-186" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb18-187"><a href="#cb18-187" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Influenza Vaccination Coverage Over Time by Age Group&quot;</span>,</span>
+<span id="cb18-188"><a href="#cb18-188" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Season/Survey Year&quot;</span>,</span>
+<span id="cb18-189"><a href="#cb18-189" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Mean Vaccination Estimate (%)&quot;</span>,</span>
+<span id="cb18-190"><a href="#cb18-190" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;Age Group&quot;</span></span>
+<span id="cb18-191"><a href="#cb18-191" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb18-192"><a href="#cb18-192" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">14</span>) <span class="sc">+</span></span>
+<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb18-194"><a href="#cb18-194" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb18-195"><a href="#cb18-195" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;bottom&quot;</span></span>
+<span id="cb18-196"><a href="#cb18-196" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-197"><a href="#cb18-197" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-198"><a href="#cb18-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-199"><a href="#cb18-199" aria-hidden="true" tabindex="-1"></a>This image needs refinement, which ChatGPT would happily provide if we continued, but it worked. We wrote zero code ourselves.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

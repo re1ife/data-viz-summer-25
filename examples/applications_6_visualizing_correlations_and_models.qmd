@@ -1,0 +1,295 @@
+---
+title: "Application 6: VisualizingCorrelations and Models"
+author: "Erik Westlund"
+date: "2025-06-12"
+
+editor:
+  render-on-save: true
+---
+
+```{r setup}
+#| message: false
+
+# List of required packages
+required_packages <- c(
+  "dplyr",
+  "ggplot2",
+  "broom.mixed",
+  "lme4",
+  "readr"
+)
+
+# Install missing packages
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load all packages
+library(dplyr)
+library(ggplot2)
+library(broom.mixed)
+library(lme4)
+library(readr)
+
+source(here::here("examples", "colors.R"))
+set.seed(123)
+```
+
+## Looking At Data: Correlations
+
+Correlations are indisposable for understanding the relationship between two variables, but they can be misleading as we show below.
+
+This is adapted directly from [Jan Vanhove](https://janhove.github.io/posts/2016-11-21-what-correlations-look-like/)
+
+```{r plot_correlations}
+#| message: false
+#| fig.height: 24
+#| fig.width: 12
+
+plot_r <- function(df, showSmoother = TRUE, smoother = "lm") {
+  p <- ggplot(df, aes(x = x, y = y)) +
+    geom_point(alpha = 0.7)
+  
+  if(showSmoother) {
+    p <- p +
+    geom_smooth(
+      formula = y ~ x,
+      method = smoother,
+      color = colors$green$`500`,
+      fill = colors$slate$`300`,
+      alpha = 0.3,
+    )
+  }
+
+  p <- p +
+    facet_wrap(~title, scales = "free", ncol = 2) +
+    theme_minimal(base_size = 12) +
+    theme(
+      strip.text = element_text(face = "bold", size = 14),
+      axis.title = element_blank(),
+      plot.title = element_text(size = 24, face = "bold", hjust = 0.5),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(size = 10),
+      panel.spacing = unit(2, "lines")
+    )
+  
+  p
+}
+
+corr_r <- function(r = 0.6, n = 50) {
+  
+  compute.y <- function(x, y, r) {
+    theta <- acos(r)
+    X <- cbind(x, y)
+    Xctr <- scale(X, center = TRUE, scale = FALSE)    # Centered variables (mean 0)
+    Id <- diag(n)                                     # Identity matrix
+    Q <- qr.Q(qr(Xctr[, 1, drop = FALSE]))            # QR decomposition
+    P <- tcrossprod(Q)                                # Projection onto space defined by x1
+    x2o <- (Id - P) %*% Xctr[, 2]                     # x2ctr made orthogonal to x1ctr
+    Xc2 <- cbind(Xctr[, 1], x2o)
+    Y <- Xc2 %*% diag(1 / sqrt(colSums(Xc2 ^ 2)))
+    y <- Y[, 2] + (1 / tan(theta)) * Y[, 1]
+    return(y)
+  }
+  
+  cases <- list(
+    list(id = 1, title = "(1) Normal x, normal residuals", x = rnorm(n), y = rnorm(n)),
+    list(id = 2, title = "(2) Uniform x, normal residuals", x = runif(n, 0, 1), y = rnorm(n)),
+    list(id = 3, title = "(3) +-skewed x, normal residuals", x = rlnorm(n, 5), y = rnorm(n)),
+    list(id = 4, title = "(4) --skewed x, normal residuals", x = rlnorm(n, 5) * -1 + 5000, y = rnorm(n)),
+    list(id = 5, title = "(5) Normal x, +-skewed residuals", x = rnorm(n), y = rlnorm(n, 5)),
+    list(id = 6, title = "(6) Normal x, --skewed residuals", x = rnorm(n), y = -rlnorm(n, 5)),
+    list(id = 7, title = "(7) Increasing spread", 
+         x = sort(rnorm(n)) + abs(min(rnorm(n))), 
+         y = rnorm(n, 0, sqrt(abs(10 * sort(rnorm(n)))))),
+    list(id = 8, title = "(8) Decreasing spread", 
+         x = sort(rnorm(n)) + abs(min(rnorm(n))), 
+         y = rnorm(n, 0, sqrt(pmax(0.1, abs(10 * max(sort(rnorm(n))) - 10 * sort(rnorm(n))))))),
+    list(id = 9, title = "(9) Quadratic trend", x = rnorm(n), y = rnorm(n) ^ 2),
+    list(id = 10, title = "(10) Sinusoid relationship", x = runif(n, -2 * pi, 2 * pi), y = sin(runif(n, -2 * pi, 2 * pi))),
+    list(id = 11, title = "(11) A single positive outlier", x = c(rnorm(n - 1), 10), y = c(rnorm(n - 1), 15)),
+    list(id = 12, title = "(12) A single negative outlier", x = c(rnorm(n - 1), 10), y = c(rnorm(n - 1), -15)),
+    list(id = 13, title = "(13) Bimodal residuals", x = rnorm(n), y = c(rnorm(floor(n / 2), mean = -3), rnorm(ceiling(n / 2), 3))),
+    list(id = 14, title = "(14) Two groups", 
+         x = c(rnorm(floor(n / 2), -3), rnorm(ceiling(n / 2), 3)), 
+         y = c(rnorm(floor(n / 2), mean = 3), rnorm(ceiling(n / 2), mean = -3))),
+    list(id = 15, title = "(15) Sampling at the extremes", 
+         x = c(rnorm(floor(n / 2)), rnorm(ceiling(n / 2), mean = 10)), 
+         y = rnorm(n)),
+    list(id = 16, title = "(16) Categorical data", 
+         x = sample(1:5, n, replace = TRUE), 
+         y = sample(1:7, n, replace = TRUE))
+  )
+  
+  df <- bind_rows(lapply(cases, function(case) {
+    id = case$id
+    x <- case$x
+    y <- compute.y(x, case$y, r)
+    data.frame(id = id, x = x, y = y, title = case$title)
+  }))
+  
+  df$title <- factor(df$title, levels = paste0("(", 1:16, ") ", c(
+    "Normal x, normal residuals",
+    "Uniform x, normal residuals",
+    "+-skewed x, normal residuals",
+    "--skewed x, normal residuals",
+    "Normal x, +-skewed residuals",
+    "Normal x, --skewed residuals",
+    "Increasing spread",
+    "Decreasing spread",
+    "Quadratic trend",
+    "Sinusoid relationship",
+    "A single positive outlier",
+    "A single negative outlier",
+    "Bimodal residuals",
+    "Two groups",
+    "Sampling at the extremes",
+    "Categorical data"
+  )))
+  
+
+  return(df)
+}
+
+
+data <- corr_r(r=0.3, n=100)
+
+analysis_data <- data |> filter(id == 1)
+model <- lm(y ~ x, data = analysis_data)
+summary(model)
+cor(analysis_data$x, analysis_data$y)
+
+plot_r(data, showSmoother=FALSE)
+
+plot_r(data, showSmoother=TRUE)
+
+```
+
+## Visualizing Model Outputs
+
+```{r model_setup}
+# Load data
+data <- read_csv(here::here("data", "processed", "simulated_data.csv"))
+
+# Sample 1/4 of the sites
+set.seed(123)
+unique_sites <- unique(data$provider_id)
+reduced_sites <- sample(unique_sites, length(unique_sites) * 0.10)
+data <- data[data$provider_id %in% reduced_sites, ]
+
+# Fit the model
+model <- glmer(
+  received_comprehensive_postnatal_care ~ 
+    race_ethnicity +
+    log(distance_to_provider) +
+    insurance +
+    multiple_gestation + 
+    placenta_previa + 
+    gest_hypertension + 
+    preeclampsia +
+    (1 | provider_id),  
+  data = data, 
+  family = binomial(link = "logit"),
+  control = glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 1e5))
+)
+
+# Create variable labels for better visualization
+variable_labels <- c(
+  "race_ethnicityaian" = "AIAN",
+  "race_ethnicityasian" = "Asian",
+  "race_ethnicityblack" = "Black",
+  "race_ethnicityhispanic" = "Hispanic",
+  "race_ethnicitynhpi" = "NHPI",
+  "race_ethnicityother" = "Other",
+  "log(distance_to_provider)" = "Log(Distance to Provider)",
+  "insuranceprivate" = "Insurance: Private",
+  "insurancestate_provided" = "Insurance: State-Provided",
+  "multiple_gestation" = "Multiple Gestation",
+  "placenta_previa" = "Placenta Previa",
+  "gest_hypertension" = "Gestational Hypertension",
+  "preeclampsia" = "Preeclampsia",
+  "(Intercept)" = "Intercept"
+)
+```
+
+```{r fixed_effects}
+#| fig.height: 8
+#| fig.width: 12
+
+# Get fixed effects with confidence intervals
+fixed_effects <- tidy(model, conf.int = TRUE) %>%
+  filter(effect == "fixed") %>%
+  # Remove any NA values
+  filter(!is.na(estimate)) %>%
+  # Create a more readable term name
+  mutate(term = case_when(
+    term == "(Intercept)" ~ "Intercept",
+    term == "age" ~ "Age",
+    term == "sexMale" ~ "Male Sex",
+    term == "raceBlack" ~ "Black Race",
+    term == "raceHispanic" ~ "Hispanic Race",
+    term == "raceOther" ~ "Other Race",
+    term == "insurancePrivate" ~ "Private Insurance",
+    term == "insuranceMedicaid" ~ "Medicaid",
+    term == "insuranceOther" ~ "Other Insurance",
+    term == "comorbidity_score" ~ "Comorbidity Score",
+    term == "emergency_admissionTRUE" ~ "Emergency Admission",
+    term == "weekend_admissionTRUE" ~ "Weekend Admission",
+    term == "night_admissionTRUE" ~ "Night Admission",
+    TRUE ~ term
+  ))
+
+# Create the forest plot
+ggplot(fixed_effects, aes(x = estimate, y = reorder(term, estimate))) +
+  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), 
+                 height = 0.2, color = colors$slate$`300`) +
+  geom_point(size = 3, color = colors$blue$`500`) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = colors$red$`600`) +
+  labs(
+    title = "Fixed Effects from GLMM",
+    subtitle = "Each point represents the estimated effect on log-odds of receiving comprehensive care",
+    x = "Effect Size (95% CI)",
+    y = "Predictor"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.text.y = element_text(size = 10)
+  )
+```
+
+```{r random_effects}
+#| fig.height: 8
+#| fig.width: 12
+
+# Get random effects
+random_effects <- ranef(model, condVar = TRUE)
+random_effects_data <- as.data.frame(random_effects)
+
+# Create the forest plot of random effects
+ggplot(random_effects_data, aes(x = condval, y = reorder(grp, condval))) +
+  geom_errorbarh(aes(xmin = condval - 1.96*sqrt(attr(random_effects$provider_id, "postVar")[1,1,]), 
+                     xmax = condval + 1.96*sqrt(attr(random_effects$provider_id, "postVar")[1,1,])), 
+                 height = 0.2, color = colors$slate$`300`) +
+  geom_point(size = 3, color = colors$blue$`500`) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = colors$red$`600`) +
+  labs(
+    title = "Random Effects by Provider",
+    subtitle = "Each point represents the provider-specific deviation from the overall intercept",
+    x = "Provider-Specific Effect (95% CI)",
+    y = "Provider ID"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.text.y = element_text(size = 10)
+  )
+```
+
+```{r model_summary}
+# Print model summary
+summary(model)
+```

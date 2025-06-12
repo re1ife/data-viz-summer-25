@@ -10,6 +10,13 @@ date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 #| message: false
 #| warning: false
 
+# Install required packages if not already installed
+required_packages <- c("dplyr", "purrr", "janitor", "dagitty", "forcats", "ggdag", 
+                      "ggplot2", "ggtext", "stringr", "kableExtra")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load required packages
 library(dplyr)
 library(purrr)
 library(janitor)
@@ -362,8 +369,7 @@ complete_dag |>
 
 ## Next Steps
 
-* We are now going to work through seven applications/case studies, each addressing a different aspect of visualization.
-* In our first case study, we will examine how to visualize spatial variation.
+* We are now going to work through several applications/case studies, each addressing a different aspect of visualization.
 
 ## Side Quest: Simulated Data
 
@@ -372,40 +378,36 @@ complete_dag |>
 
 # Applications
 
-## Application 1: Choropleths
+## Application 1: Effective and Honest Scales
 
-* In `applications_1_choropleth.qmd` we create a choropleth map of the United States using the simulated data from above
+* In `applications_1_effective_and_honest_scales.qmd` we look at how to use scales and position effectively
+* We examine how axes can be used to mislead or clarify
+
+## Application 2: Choropleths for Spatial Data
+
+* In `applications_2_choropleths_for_spatial_data.qmd` we create a choropleth map of the United States using the simulated data from above
 * We show how even with maps, small multiples help find clarity
 
-## Application 2: Forest Plots
+## Application 3: Dot Plots for Spatial Data
 
-* In `applications_2_forest_plots.qmd` we create a forest plot of the data using the same simulated data.
+* In `applications_3_dot_plot_for_spatial_data.qmd` we create a dot plot of the data using the same simulated data.
 * We show how spatial variation can often be visualized better without actual maps.
 
-## Application 3: Ridgeline Plots
+## Application 4: Distribution Plots
 
-* In `applications_3_ridge_plots.qmd` we create a ridgeline plot of the data using the same simulated data.
-* We show how ridgeline plots can show distributional differences across groups.
+* In `applications_4_distribution_plots.qmd` we examine distributions of variables
+* We create box plots, violin plots, and ridgeline plots to show the distribution of a variable across a population.
 
-## Application 4: Distributions
+## Application 5: Visualizing Time Trends
 
-* In `applications_4_distributions.qmd` we examine distributions of variables
-* Wecreate box plots and violin plots to show the distribution of a variable across a population.
-
-## Application 5: Time Trends
-
-* In `applications_5_time_trends.qmd` we examine time trends of variables
+* In `applications_5_visualizing_time_trends.qmd` we examine time trends of variables
 * We create line plots to show how a variable changes over time.
+* We also show how to visualize time trends using a sankey and sunburst plots.
 
-## Application 6: Scale Honesty & Effectiveness  
+## Application 6: Visualizing Correlations and Models  
 
-* In `applications_6_scale_honesty.qmd` we examine how axes can be used to mislead or clarify
-* We briefly discuss how what counts as dishonest may be contextual
-
-## Application 7: Visualizing Models  
-
-* In `applications_7_visualizing_models.qmd` we visualize model outputs
-* We create coefficient plots and model predictions to help interpret the model
+* In `applications_6_visualizing_correlations_and_models.qmd` we visualize correlations and model outputs
+* We'll look at why it's important to visualize correlations and model outputs
 
 
 # Summary and Takeaways

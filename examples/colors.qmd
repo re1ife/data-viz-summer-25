@@ -11,6 +11,12 @@ editor:
 ```{r setup}
 #| message: false
 
+# Install required packages if not already installed
+required_packages <- c("dplyr", "ggplot2", "RColorBrewer", "viridis", "kableExtra", "tidyr", "ggridges")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load required packages
 library(dplyr)
 library(ggplot2)
 library(RColorBrewer)
@@ -88,7 +94,7 @@ set.seed(123)
 heatmap_data <- expand.grid(
   x = 1:10,
   y = 1:10
-) %>%
+) |>
   mutate(
     value = rnorm(100, mean = 50, sd = 15)
   )
@@ -120,12 +126,12 @@ data <- data.frame(
 data$difference <- data$support - data$oppose
 
 # Reshape data for diverging bars
-data_long <- data %>%
+data_long <- data |>
   pivot_longer(
     cols = c(support, oppose),
     names_to = "response",
     values_to = "percentage"
-  ) %>%
+  ) |>
   mutate(
     percentage = ifelse(response == "oppose", -percentage, percentage)
   )
@@ -264,9 +270,9 @@ ridge_data <- data.frame(
 )
 
 # Calculate mean temperatures and sort cities
-city_means <- ridge_data %>%
-  group_by(city) %>%
-  summarize(mean_temp = mean(temperature)) %>%
+city_means <- ridge_data |>
+  group_by(city) |>
+  summarize(mean_temp = mean(temperature)) |>
   arrange(desc(mean_temp))
 
 # Reorder the factor levels of city based on mean temperature

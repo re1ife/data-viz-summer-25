@@ -2,14 +2,20 @@
 title: "PRAMS Data Analysis: Iteration, Aggregation, & Transformation"
 author: "Erik Westlund"
 date: "2025-06-11"
-date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 
 editor:
   render-on-save: true
 ---
 
 ```{r setup}
+#| message: false
 
+# Install required packages if not already installed
+required_packages <- c("dplyr", "ggplot2", "forcats", "kableExtra", "readr", "ggtext")
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load required packages
 library(dplyr)
 library(ggplot2)
 library(forcats)

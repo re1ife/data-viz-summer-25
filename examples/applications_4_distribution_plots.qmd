@@ -1,0 +1,278 @@
+---
+title: "Application 4: Distribution Plots"
+author: "Erik Westlund"
+date: "2025-06-12"
+
+editor:
+  render-on-save: true
+---
+
+```{r setup}
+#| message: false
+
+# List of required packages
+required_packages <- c(
+  "dplyr",
+  "ggplot2",
+  "ggridges",
+  "kableExtra",
+  "purrr"
+)
+
+# Install missing packages
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load all packages
+library(dplyr)
+library(ggplot2)
+library(ggridges)
+library(kableExtra)
+library(purrr)
+```
+
+## Distribution
+
+The distribution or spread of data is often of comparable importance to measures of central tendency. There are numerous visualizations that can be used to understand distributions. Below we will explore box plots, violin plots, and ridgeline plots.
+
+## Simulate Physical Activity Data
+
+Let's simulate data on weekly minutes of moderate-to-vigorous physical activity (MVPA) across different job types in New England states.
+
+```{r simulate_data}
+#| message: false
+
+set.seed(123)
+
+# Number of observations
+n <- 5000
+
+# Function to generate data with outliers
+generate_with_outliers <- function(n, mean, sd, outlier_prob = 0.1, outlier_sd = 3) {
+  # Generate main distribution
+  main_data <- rnorm(n, mean, sd)
+  
+  # Add outliers
+  is_outlier <- runif(n) < outlier_prob
+  outliers <- rnorm(n, mean, sd * outlier_sd)
+  
+  # Combine
+  ifelse(is_outlier, outliers, main_data)
+}
+
+# Function to generate bimodal distribution
+generate_bimodal <- function(n, mean1, mean2, sd1, sd2, prob1 = 0.5) {
+  # Generate two normal distributions
+  dist1 <- rnorm(n, mean1, sd1)
+  dist2 <- rnorm(n, mean2, sd2)
+  
+  # Randomly choose between the two distributions
+  is_dist1 <- runif(n) < prob1
+  
+  # Combine
+  ifelse(is_dist1, dist1, dist2)
+}
+
+# Simulate data
+activity_data <- tibble(
+  # Job types
+  job_type = sample(c("Office Work", "Service Industry", "Healthcare", "Construction", "Education", "Professional Athlete"), 
+                   size = n, 
+                   replace = TRUE,
+                   prob = c(0.25, 0.25, 0.2, 0.15, 0.1, 0.05))
+) |>
+  # Generate MVPA minutes based on job type
+  mutate(
+    # Base MVPA with job-specific variance and outliers
+    mvpa = case_when(
+      job_type == "Office Work" ~ rnorm(n, mean = 80, sd = 30),
+      job_type == "Service Industry" ~ generate_with_outliers(n, mean = 130, sd = 35, outlier_prob = 0.15),
+      job_type == "Healthcare" ~ generate_bimodal(n, 
+                                                 mean1 = 120, sd1 = 30,  # First mode (more sedentary)
+                                                 mean2 = 280, sd2 = 40,  # Second mode (more active)
+                                                 prob1 = 0.6),           # 60% in first mode
+      job_type == "Education" ~ rnorm(n, mean = 160, sd = 40),
+      job_type == "Construction" ~ rnorm(n, mean = 250, sd = 20),
+      job_type == "Professional Athlete" ~ rnorm(n, mean = 450, sd = 30)
+    ),
+    # Ensure non-negative values
+    mvpa = pmax(0, mvpa)
+  )
+
+# Show first few rows
+activity_data |> head() |> kable()
+```
+
+## Box Plots
+
+Box plots are great for showing the distribution of a continuous variable across different groups. They show:
+- Median (middle line)
+- Interquartile range (box)
+- Range (whiskers)
+- Outliers (points)
+
+```{r box_plots}
+#| fig.height: 8
+#| message: false
+
+# Create box plots by job type
+p_box <- ggplot(activity_data, aes(x = job_type, y = mvpa, fill = job_type)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_viridis_d(option = "plasma") +
+  labs(
+    title = "Weekly Minutes of Moderate-to-Vigorous Physical Activity by Job Type",
+    x = "Job Type",
+    y = "Minutes per Week",
+    fill = "Job Type"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5, margin = margin(b = 20)),
+    plot.title.position = "plot",
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 8),
+    legend.position = "bottom",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 8)
+  )
+
+p_box
+```
+
+## Violin Plots
+
+Violin plots show the full distribution of the data, not just the summary statistics. They're particularly useful for:
+- Seeing the shape of the distribution
+- Identifying multiple modes
+- Comparing distributions across groups
+
+```{r violin_plots}
+#| fig.height: 8
+#| message: false
+
+# Create violin plots by job type
+p_violin <- ggplot(activity_data, aes(x = job_type, y = mvpa, fill = job_type)) +
+  geom_violin(alpha = 0.7) +
+  scale_fill_viridis_d(option = "plasma") +
+  labs(
+    title = "Weekly Minutes of Moderate-to-Vigorous Physical Activity by Job Type",
+    x = "Job Type",
+    y = "Minutes per Week",
+    fill = "Job Type"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5, margin = margin(b = 20)),
+    plot.title.position = "plot",
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 8),
+    legend.position = "bottom",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 8)
+  )
+
+p_violin
+```
+
+## Violin-Box Plot
+
+```{r violin_box_plot}
+#| fig.height: 5
+#| message: false
+
+# Create violin-box plot
+p_violin_box <- ggplot(activity_data, aes(x = mvpa, y = reorder(job_type, mvpa, FUN = median), fill = job_type)) +
+  # Add violin plot
+  geom_violin(
+    alpha = 0.7,
+    scale = "width"
+  ) +
+  # Add boxplot
+  geom_boxplot(
+    width = 0.2,
+    alpha = 0.7,
+    fill = "white",
+    outlier.shape = NA
+  ) +
+  # Customize scales
+  scale_x_continuous(
+    name = "Weekly MVPA Minutes",
+    limits = c(0, 600),
+    breaks = seq(0, 600, 100)
+  ) +
+  scale_fill_viridis_d(option = "magma") +
+  # Add labels
+  labs(
+    title = "Distribution of Weekly Physical Activity by Job Type",
+    caption = "Box shows median and quartiles, violin shows full distribution",
+    y = "Job Type"
+  ) +
+  # Customize theme
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5, margin = margin(b = 10)),
+    plot.caption = element_text(size = 10, hjust = 0.5, margin = margin(t = 20)),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 8),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  )
+
+p_violin_box
+```
+
+## Ridgeline Plots
+
+Ridgeline plots are great for comparing distributions across many groups. They're particularly useful when:
+- You have many groups to compare
+- You want to see the full distribution for each group
+- You want to identify patterns across groups
+
+```{r ridgeline_plot}
+#| fig.height: 5
+#| message: false
+
+# Create ridgeline plot
+p_ridge <- ggplot(activity_data, aes(x = mvpa, y = reorder(job_type, mvpa, FUN = median), fill = after_stat(x))) +
+  # Add density ridges
+  geom_density_ridges_gradient(
+    scale = 3,
+    alpha = 0.7,
+    quantile_lines = TRUE,
+    quantiles = 2,
+    show.legend = TRUE
+  ) +
+  # Customize scales
+  scale_x_continuous(
+    name = "Weekly MVPA Minutes",
+    limits = c(0, 600),
+    breaks = seq(0, 600, 100)
+  ) +
+  scale_fill_viridis_c(option = "magma", name = "Minutes") +
+  # Add labels
+  labs(
+    title = "Distribution of Weekly Physical Activity by Job Type",
+    caption = "Vertical lines show median minutes of activity for each job type",
+    y = "Job Type"
+  ) +
+  # Customize theme
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold", hjust = 0.5, margin = margin(b = 10)),
+    plot.caption = element_text(size = 10, hjust = 0.5, margin = margin(t = 20)),
+    plot.title.position = "plot",
+    plot.caption.position = "plot",
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 8),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "right",
+    legend.title = element_text(size = 8, face = "bold"),
+    legend.text = element_text(size = 8)
+  )
+
+p_ridge
+```

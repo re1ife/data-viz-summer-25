@@ -1,0 +1,170 @@
+---
+title: "Application 3: Dot Plots"
+author: "Erik Westlund"
+date: "2025-06-12"
+
+editor:
+  render-on-save: true
+---
+
+```{r setup}
+#| message: false
+
+# List of required packages
+required_packages <- c(
+  "readr",
+  "dplyr",
+  "ggplot2",
+  "forcats",
+  "tidyr",
+  "kableExtra",
+  "stringr",
+  "ggrepel",
+  "maps",
+  "usmap",
+  "sf"
+)
+
+# Install missing packages
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load all packages
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(forcats)
+library(tidyr)
+library(kableExtra)
+library(stringr)
+library(ggrepel)
+library(maps)
+library(usmap)
+library(sf)
+
+source(here::here("examples", "colors.R"))
+```
+
+## Load and Prepare
+
+As usual, we start by loading and preparing the data.
+
+```{r data_prep}
+#| message: false
+
+data <- readr::read_csv(here::here("data", "processed", "simulated_data.csv"))
+state_data <- readr::read_csv(here::here("data", "processed", "state_data.csv"))
+
+data <- data |>
+  mutate(
+    state = as.factor(state),
+    received_comprehensive_postnatal_care = as.numeric(received_comprehensive_postnatal_care),
+    insurance = fct_relevel(insurance, "no_insurance"),
+    race_ethnicity = fct_relevel(race_ethnicity, "white"),
+    edu = fct_relevel(edu, "hs"),
+    job_type = fct_relevel(job_type, "unemployed"),
+  )
+
+data$self_report_income <- factor(data$self_report_income, levels = c(
+  "0–$25,000",
+  "$25,000–$50,000",
+  "$50,000–$75,000",
+  "$75,000–$100,000",
+  "$100,000–$125,000",
+  "$125,000–$150,000",
+  "$150,000–$175,000",
+  "$175,000+"
+))
+
+# Set "$50,000–$75,000" as the reference category
+data$self_report_income <- fct_relevel(data$self_report_income, "$50,000–$75,000")
+
+race_ethnicity_labels <- c("American Indian or Alaska Native" = "aian",
+          "White" = "white",
+          "Black" = "black",
+          "Asian" = "asian",
+          "Hispanic" = "hispanic",
+          "Native Hawaiian or Pacific Islander" = "nhpi",
+          "Other" = "other")
+
+data |> head() |> kable()
+```
+
+## Dot Plots
+
+In `applications_2_choropleth.qmd` we drew up a choropleth map of the receipt of comprehensive postnatal care by state. Let's see if a dot plot can help us understand the data better.
+
+```{r dot-plot}
+#| fig.height: 10
+
+# Calculate overall proportions for all states
+overall_care_data <- data |>
+  group_by(state) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  ) |>
+  mutate(race_ethnicity = "Overall")
+
+# Calculate proportions for each race
+race_care_data <- data |>
+  filter(race_ethnicity %in% c("white", "black", "hispanic", "asian")) |>
+  group_by(state, race_ethnicity) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care, na.rm = TRUE),
+    n = n(),
+    .groups = "drop"
+  )  |>
+  mutate(
+    race_ethnicity = fct_recode(race_ethnicity, !!!race_ethnicity_labels)
+  ) ## will have warning because we dropped some race/eth cats
+
+
+# Combine overall and race-specific data
+dot_plot_data <- bind_rows(overall_care_data, race_care_data)
+
+# Sort states by overall proportion (to ensure consistent order across facets)
+state_order <- dot_plot_data |>
+  filter(race_ethnicity == "Overall") |>
+  arrange(proportion) |>
+  pull(state)
+
+dot_plot_data <- dot_plot_data |>
+  mutate(state = factor(state, levels = state_order)) |> 
+  mutate(
+    race_ethnicity = factor(
+      race_ethnicity,
+      levels = c("Overall", "White", "Black", "Hispanic", "Asian")
+    )
+  )
+
+ggplot(dot_plot_data, aes(x = proportion, y = state)) +
+  geom_point(size = 3, color = colors$blue$`500`) +
+  geom_segment(
+    aes(x = 0, xend = proportion, y = state, yend = state),
+    color = colors$blue$`500`,
+    linetype = "dotted"
+  ) +
+  facet_wrap(~race_ethnicity, ncol = 5, scales = "free_y") +
+  scale_x_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    title = "Proportion Receiving Comprehensive Postnatal Care",
+    x = "Proportion",
+    y = "State",
+    caption = "Source: Simulated Data"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.y = element_text(size = 8),
+    strip.text = element_text(size = 11, face = "bold"),
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    plot.caption = element_text(size = 10, hjust = 0)
+  )
+```
+
+We find that, in fact, the dot plot is superior to the choropleth map to visualize the spatial trends that exist in the data.
+
+I would encourage you to always try to visualize spatial data using non-map-based visualizations. In many cases, maps foreground non-causal phenomena like population density.
+
+For comparison, compare the above to the choropleth map we made in `applications_2_choropleth.qmd`.

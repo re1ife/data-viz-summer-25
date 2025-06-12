@@ -1,0 +1,436 @@
+---
+title: "Application 1: Effective Use of Position and Scales"
+author: "Erik Westlund"
+date: "2025-06-12"
+
+editor:
+  render-on-save: true
+---
+
+
+```{r setup}
+#| include: false
+
+# List of required packages
+required_packages <- c(
+  "dplyr",
+  "ggplot2",
+  "tidyr",
+  "here",
+  "patchwork",
+  "viridis",
+  "RColorBrewer"
+)
+
+# Install missing packages
+new_packages <- required_packages[!(required_packages %in% installed.packages()[,"Package"])]
+if(length(new_packages)) install.packages(new_packages)
+
+# Load all packages
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(here)
+library(patchwork)
+library(viridis)
+library(RColorBrewer)
+
+# Set theme
+theme_set(theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.caption = element_text(size = 10, color = "gray50"),
+    axis.title = element_text(size = 12),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 10),
+    panel.grid.minor = element_blank()
+  )
+)
+
+# Set seed for reproducibility
+set.seed(123)
+```
+
+## Introduction
+
+This notebook demonstrates how axis scaling and data presentation can be used effectively or to mislead. We'll explore how to use positions and scales to make data more understandable, particularly with respect to magnitudes.
+
+We'll explore two main techniques to mislead:
+
+1. Truncated axes in bar plots that exaggerate small differences
+2. Selective time windows in time series that create misleading trends
+
+
+## Position, Scale, and Magnitude 
+
+
+```{r magnitude_examples}
+#| message: false
+
+set.seed(123)
+n <- 1000
+
+# Create simulated patient data with more distinct patterns
+patient_data <- data.frame(
+  patient_id = 1:n,
+  treatment = sample(c("Standard", "New"), n, replace = TRUE),
+  age_group = sample(c("Young", "Elderly"), n, replace = TRUE),
+  hospital = sample(c("City", "County", "University", "Private"), n, replace = TRUE)
+)
+
+# Create more distinct base rates by hospital
+hospital_effects <- c(
+  "City" = 0.25,      # Higher rates in city hospitals
+  "County" = 0.15,    # Moderate rates in county hospitals
+  "University" = 0.10, # Lower rates in university hospitals
+  "Private" = 0.08    # Lowest rates in private hospitals
+)
+
+# Add random variation and treatment/age effects
+patient_data$readmission_rate <- vapply(1:n, function(i) {
+  h <- patient_data$hospital[i]
+  base_rate <- hospital_effects[h]
+  # Add some random variation
+  rate <- base_rate + rnorm(1, 0, 0.02)
+  # Treatment effect (20% reduction for new treatment)
+  rate <- rate * ifelse(patient_data$treatment[i] == "New", 0.8, 1)
+  # Age effect (30% increase for elderly)
+  rate <- rate * ifelse(patient_data$age_group[i] == "Elderly", 1.3, 1)
+  return(rate)
+}, numeric(1))
+
+# Ensure rates stay between 0 and 1
+patient_data$readmission_rate <- pmin(pmax(patient_data$readmission_rate, 0), 1)
+
+# Create summary data for bubble chart
+bubble_data <- patient_data |>
+  group_by(hospital, age_group) |>
+  summarize(
+    readmission_rate = mean(readmission_rate),
+    patient_count = n(),
+    .groups = "drop"
+  )
+
+# 0. Worst Example: Bubble Chart (Area/Volume)
+ggplot(bubble_data, aes(x = hospital, y = age_group)) +
+  geom_point(
+    aes(size = readmission_rate * 100),  # Scale up for better visibility
+    shape = 21,
+    fill = "#34D399",
+    color = "black",
+    alpha = 0.7
+  ) +
+  geom_text(
+    aes(label = sprintf("%.1f%%", readmission_rate * 100)),
+    size = 3,
+    vjust = -4.5
+  ) +
+  scale_size_continuous(
+    range = c(5, 20),
+    name = "Readmission Rate (%)"
+  ) +
+  labs(
+    title = "Readmission Rates by Hospital and Age Group (Bubble Chart)",
+    subtitle = "Why bubble charts are bad: Humans are poor at comparing areas",
+    x = "Hospital",
+    y = "Age Group"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    legend.position = "right"
+  )
+
+# 1. Area/Volume (Why pie charts are bad)
+pie_data <- patient_data |>
+  group_by(hospital, treatment) |>
+  summarize(
+    count = n(),
+    .groups = "drop"
+  ) |>
+  group_by(hospital) |>
+  mutate(
+    total = sum(count),
+    proportion = count / total,
+    label = treatment
+  ) |> 
+  group_by(hospital) |>
+  mutate(position = cumsum(proportion) - (proportion / 2)) |> 
+  ungroup()
+
+# Create pie charts
+standard_pie <- pie_data |>
+  filter(hospital == "City") |>
+  ggplot(aes(x = "", y = proportion, fill = treatment)) +
+  geom_bar(stat = "identity", width = 1, color = "black", fill = "white") +
+  coord_polar(theta = "y") +
+  geom_text(aes(y = position, label = label), size = 6) +
+  labs(
+    title = "City Hospital",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16)
+  )
+
+university_pie <- pie_data |>
+  filter(hospital == "University") |>
+  ggplot(aes(x = "", y = proportion, fill = treatment)) +
+  geom_bar(stat = "identity", width = 1, color = "black", fill = "white") +
+  coord_polar(theta = "y") +
+  geom_text(aes(y = position, label = label), size = 6) +
+  labs(
+    title = "University Hospital",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_void() +
+  theme(
+    legend.position = "none",
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16)
+  )
+
+# Display pie charts
+(standard_pie + university_pie) +
+  plot_annotation(
+    title = "Treatment Distribution by Hospital (Pie Charts)",
+    subtitle = "Why pie charts are bad: Humans are poor at comparing areas and angles",
+    theme = theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 20),
+      plot.subtitle = element_text(hjust = 0.5, size = 14)
+    )
+  )
+
+# 2. Position on non-common scale
+ggplot(patient_data, aes(x = hospital, y = readmission_rate)) +
+  geom_bar(stat = "summary", fun = "mean", fill = "#34D399", color = "black") +
+  facet_wrap(~ age_group, nrow = 1, scales = "free_y") +
+  labs(
+    title = "Readmission Rates by Hospital (Non-Common Scale)",
+    subtitle = "Different scales make comparisons difficult",
+    x = "Hospital",
+    y = "Readmission Rate"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12)
+  )
+
+# 3. Position on common scale
+ggplot(patient_data, aes(x = hospital, y = readmission_rate)) +
+  geom_bar(stat = "summary", fun = "mean", fill = "#34D399", color = "black") +
+  facet_wrap(~ age_group, nrow = 1) +
+  labs(
+    title = "Readmission Rates by Hospital (Common Scale)",
+    subtitle = "Common scale makes comparisons easier and more accurate",
+    x = "Hospital",
+    y = "Readmission Rate"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 16),
+    plot.subtitle = element_text(hjust = 0.5, size = 12)
+  )
+```
+
+
+## Naughty Axes
+
+This section demonstrates how axis scaling can be used to mislead viewers about the magnitude of differences between groups in health outcomes. We'll use a simulated dataset of treatment effects on adverse events.
+
+The key technique here is truncating the y-axis to start above zero, which makes small differences appear much larger than they actually are. This is particularly effective when the actual differences are very small percentages.
+
+```{r naughty_axes}
+#| message: false
+#| fig.height: 8
+
+# Force regular decimal notation
+options(scipen=999)
+
+n <- 500000
+
+data <- data.frame(
+  treatment = rbinom(n, 1, 0.5),  # 1 = new treatment, 0 = standard care
+  age_group = rbinom(n, 1, 0.5)   # 1 = older adults, 0 = younger adults
+)
+
+base_prob <- 0.000001 # 0.0001% baseline risk
+
+data$adverse_event <- rbinom(
+  n, 1, base_prob * (1 + 3 * data$treatment + 2 * data$age_group)
+)
+
+model <- glm(adverse_event ~ treatment, data = data, family = "binomial")
+summary(model)
+
+summary_data <- data |>
+  group_by(treatment) |>
+  summarize(
+    risk = mean(adverse_event),
+    n = n(),
+    .groups = "drop"
+  )
+
+# Plot with constrained axes
+ggplot(summary_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
+  geom_col(width = 0.7) +
+  geom_text(
+    aes(label = paste0("p = ", sprintf("%.6f", risk))),
+    vjust = -0.5,
+    size = 3
+  ) +
+  scale_fill_brewer(palette = "Set2", labels = c("Standard Care", "New Treatment")) +
+  labs(
+    title = "Risk of Adverse Event by Treatment",
+    x = "Treatment",
+    y = "Proportion with Adverse Event",
+    fill = "Treatment"
+  ) +
+  scale_y_continuous(limits = c(0, max(summary_data$risk) * 1.5)) +
+  theme_minimal()
+
+# Now add age group stratification
+stratified_data <- data |>
+  group_by(age_group, treatment) |>
+  summarize(
+    risk = mean(adverse_event),
+    n = n(),
+    .groups = "drop"
+  )
+
+# Plot with constrained y-axis
+ggplot(stratified_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
+  geom_col(width = 0.7) +
+  geom_text(
+    aes(label = paste0("p = ", sprintf("%.6f", risk))),
+    vjust = -0.5,
+    size = 3
+  ) +
+  scale_fill_brewer(palette = "Set2", labels = c("Standard Care", "New Treatment")) +
+  facet_wrap(~ age_group, nrow = 1, 
+             labeller = labeller(age_group = c(`0` = "Younger Adults", `1` = "Older Adults"))) +
+  labs(
+    title = "Risk of Adverse Event by Treatment and Age Group",
+    subtitle = "Y-axis truncated to emphasize differences",
+    x = "Treatment",
+    y = "Probability of Adverse Event",
+    fill = "Treatment"
+  ) +
+  scale_y_continuous(limits = c(0, max(stratified_data$risk) * 1.5)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 10),
+    axis.title = element_text(size = 12),
+    strip.text = element_text(size = 11, face = "bold")
+  )
+
+# Plot with full scale
+ggplot(stratified_data, aes(x = factor(treatment), y = risk, fill = factor(treatment))) +
+  geom_col(width = 0.7) +
+  geom_text(
+    aes(label = paste0("p = ", sprintf("%.6f", risk))),
+    vjust = -0.5,
+    size = 3
+  ) +
+  scale_fill_brewer(palette = "Set2", labels = c("Standard Care", "New Treatment")) +
+  facet_wrap(~ age_group, nrow = 1, 
+             labeller = labeller(age_group = c(`0` = "Younger Adults", `1` = "Older Adults"))) +
+  labs(
+    title = "Risk of Adverse Event by Treatment and Age Group",
+    subtitle = "Full scale (0 to 1) showing true magnitude of differences",
+    x = "Treatment",
+    y = "Probability of Adverse Event",
+    fill = "Treatment"
+  ) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 10),
+    axis.title = element_text(size = 12),
+    strip.text = element_text(size = 11, face = "bold")
+  )
+```
+
+## Naughty Time Series Axes
+
+This section demonstrates how time series plots can be misleading when zooming in on specific time periods, using simulated data on Emergency Department bounceback rates as an example. The key technique here is selective windowing, or choosing a specific time period that supports a desired narrative while ignoring the broader context.
+
+```{r naughty_time_series}
+#| message: false
+#| fig.height: 8
+
+# Create explicit data points
+bounceback_data <- data.frame(
+  Year = 1:30,
+  BouncebackRate = c(
+    # First 20 years stable around 15% with noise
+    0.151, 0.149, 0.152, 0.148, 0.153, 0.147, 0.150, 0.152, 0.148, 0.151,
+    0.149, 0.153, 0.147, 0.150, 0.152, 0.148, 0.151, 0.149, 0.153, 0.147,
+    # Year 21-22: Still stable
+    0.151, 0.149,
+    # Year 23-25: Short dip to 12-13%
+    0.128, 0.127, 0.129,
+    # Year 26-30: Back to stable around 15%
+    0.151, 0.149, 0.152, 0.148, 0.153
+  )
+)
+
+# Plot showing full scale
+ggplot(bounceback_data, aes(x = Year, y = BouncebackRate)) +
+  geom_line(color = viridis(1)) +
+  geom_point(color = viridis(1)) +
+  geom_text(
+    data = bounceback_data[c(1, 30), ],
+    aes(label = paste0(sprintf("%.1f", BouncebackRate * 100), "%")),
+    nudge_y = 0.01,
+    size = 3
+  ) +
+  scale_y_continuous(
+    labels = scales::percent,
+    limits = c(0, 0.2),
+    breaks = seq(0, 0.2, 0.05)
+  ) +
+  labs(
+    title = "ED Bounceback Rates Over 30 Years",
+    x = "Year",
+    y = "Bounceback Rate"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold")
+  )
+
+# Misleading plot starting at year 23
+ggplot(bounceback_data[bounceback_data$Year >= 23, ], aes(x = Year, y = BouncebackRate)) +
+  geom_line(color = viridis(1)) +
+  geom_point(color = viridis(1)) +
+  geom_text(
+    data = bounceback_data[bounceback_data$Year %in% c(23, 30), ],
+    aes(label = paste0(sprintf("%.1f", BouncebackRate * 100), "%")),
+    nudge_y = 0.003,
+    size = 3
+  ) +
+  scale_y_continuous(
+    labels = scales::percent,
+    limits = c(0.12, 0.16),
+    breaks = seq(0.12, 0.16, 0.01)
+  ) +
+  labs(
+    title = "ED Bounceback Rates Since My Enemy Took Power",
+    x = "Year",
+    y = "Bounceback Rate"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12)
+  )
+```
