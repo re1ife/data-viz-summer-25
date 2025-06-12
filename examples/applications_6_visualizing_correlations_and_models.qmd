@@ -16,7 +16,8 @@ required_packages <- c(
   "ggplot2",
   "broom.mixed",
   "lme4",
-  "readr"
+  "readr",
+  "emmeans"
 )
 
 # Install missing packages
@@ -29,6 +30,7 @@ library(ggplot2)
 library(broom.mixed)
 library(lme4)
 library(readr)
+library(emmeans)
 
 source(here::here("examples", "colors.R"))
 set.seed(123)
@@ -38,7 +40,7 @@ set.seed(123)
 
 Correlations are indisposable for understanding the relationship between two variables, but they can be misleading as we show below.
 
-This is adapted directly from [Jan Vanhove](https://janhove.github.io/posts/2016-11-21-what-correlations-look-like/)
+This is adapted directly from [Jan Vanhove](https://janhove.github.io/posts/2016-11-21-what-correlations-look-like/).
 
 ```{r plot_correlations}
 #| message: false
@@ -166,6 +168,10 @@ plot_r(data, showSmoother=TRUE)
 
 ## Visualizing Model Outputs
 
+Visualization of model outputs is often neglected, but it can be a powerful way both to undrestand and to communicate the results of a model. A number of packages exist to help with this, including `broom.mixed`, `emmeans`, and `ggeffects`.
+
+Here, we fit a logistic mixed-effects model using the glmer() function to estimate the odds of receiving comprehensive postnatal care. This model accounts for both fixed effects (individual-level predictors like race or insurance status) and a random intercept for provider, which captures unobserved heterogeneity across providers.
+
 ```{r model_setup}
 # Load data
 data <- read_csv(here::here("data", "processed", "simulated_data.csv"))
@@ -210,6 +216,10 @@ variable_labels <- c(
   "(Intercept)" = "Intercept"
 )
 ```
+
+Below, we extract the fixed-effect estimates using `broom.mixed::tidy()`, including 95% confidence intervals, and plot them as a coefficient plot (a forest plot for regression coefficients).
+
+Each point shows the estimated log-odds of receiving comprehensive care associated with a given covariate, holding other variables constant. The dashed vertical line at 0 represents no effect.
 
 ```{r fixed_effects}
 #| fig.height: 8
@@ -258,6 +268,99 @@ ggplot(fixed_effects, aes(x = estimate, y = reorder(term, estimate))) +
     axis.text.y = element_text(size = 10)
   )
 ```
+
+
+## Predicted Probabilities by Covariate Groups
+
+Here, we use the emmeans package to estimate marginal predicted probabilities for selected covariates. These represent the expected probability of receiving comprehensive care for each level of a covariate, averaging over the distribution of other covariates in the model. This approach helps isolate the relationship between each covariate and the outcome while controlling for confounding. We visualize these estimates and their 95% confidence intervals, grouped by domain (e.g., race/ethnicity, insurance, medical conditions).
+
+```{r predicted_probabilities}
+#| fig.height: 12
+#| fig.width: 12
+
+# Calculate predicted probabilities for each covariate group
+library(emmeans)
+
+# Race/Ethnicity
+race_probs <- emmeans(model, ~ race_ethnicity, type = "response")
+race_probs_df <- as.data.frame(race_probs) %>%
+  mutate(
+    group = "Race/Ethnicity",
+    category = case_when(
+      race_ethnicity == "aian" ~ "AIAN",
+      race_ethnicity == "asian" ~ "Asian",
+      race_ethnicity == "black" ~ "Black",
+      race_ethnicity == "hispanic" ~ "Hispanic",
+      race_ethnicity == "nhpi" ~ "NHPI",
+      race_ethnicity == "other" ~ "Other",
+      race_ethnicity == "white" ~ "White"
+    )
+  )
+
+# Insurance
+insurance_probs <- emmeans(model, ~ insurance, type = "response")
+insurance_probs_df <- as.data.frame(insurance_probs) %>%
+  mutate(
+    group = "Insurance",
+    category = case_when(
+      insurance == "medicaid" ~ "Medicaid",
+      insurance == "private" ~ "Private",
+      insurance == "state_provided" ~ "State-Provided",
+      insurance == "uninsured" ~ "Uninsured",
+      TRUE ~ "Other"
+    )
+  )
+
+# Medical Conditions
+conditions_probs <- emmeans(model, ~ multiple_gestation + placenta_previa + gest_hypertension + preeclampsia, type = "response")
+conditions_probs_df <- as.data.frame(conditions_probs) %>%
+  mutate(
+    group = "Medical Conditions",
+    category = case_when(
+      multiple_gestation == 1 ~ "Multiple Gestation",
+      placenta_previa == 1 ~ "Placenta Previa",
+      gest_hypertension == 1 ~ "Gestational Hypertension",
+      preeclampsia == 1 ~ "Preeclampsia",
+      TRUE ~ "No Medical Conditions"
+    )
+  ) %>%
+  # Remove duplicates where multiple conditions are true
+  distinct(category, .keep_all = TRUE)
+
+# Combine all predictions
+all_probs <- bind_rows(
+  race_probs_df %>% select(group, category, prob, asymp.LCL, asymp.UCL),
+  insurance_probs_df %>% select(group, category, prob, asymp.LCL, asymp.UCL),
+  conditions_probs_df %>% select(group, category, prob, asymp.LCL, asymp.UCL)
+)
+
+# Create faceted plot
+ggplot(all_probs, aes(x = prob, y = reorder(category, prob))) +
+  geom_errorbarh(aes(xmin = asymp.LCL, xmax = asymp.UCL), 
+                 height = 0.2, color = colors$slate$`300`) +
+  geom_point(size = 3, color = colors$blue$`500`) +
+  facet_wrap(~ group, scales = "free_y", ncol = 1) +
+  labs(
+    title = "Predicted Probability of Receiving Comprehensive Care",
+    subtitle = "By Covariate Groups",
+    x = "Predicted Probability (95% CI)",
+    y = "Category"
+  ) +
+  scale_x_continuous(labels = scales::percent) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    axis.text.y = element_text(size = 10),
+    strip.text = element_text(size = 12, face = "bold")
+  )
+```
+
+
+## Provider-Level Random Effects
+
+We visualize the provider-level random intercepts, which represent the estimated deviation of each provider from the overall mean (intercept) after accounting for the fixed effects in the model. This helps reveal between-provider variability and can identify providers whose outcomes are systematically higher or lower than expected. The dashed vertical line at zero indicates the overall average; providers to the right have higher-than-average effects, and those to the left are lower.
 
 ```{r random_effects}
 #| fig.height: 8
