@@ -1,9 +1,17 @@
 ---
-title: "Data Visualization Course Materials"
-format: html
+title: "Summer 2025 Course on Data Visualization"
+author: "Erik Westlund"
+date-modified: "`r format(Sys.Date(), '%Y-%m-%d')`"
 ---
 
-# Course Materials
+This course was offered as a 1-credit introduction (5.5 instruction hours) to data visualization as part of the Johns Hopkins Bloomberg School of Public Health's [43rd Graduate Summer Institute of Epidemiology and Biostatistics](https://publichealth.jhu.edu/academics/graduate-summer-institute-of-epidemiology-and-biostatistics).
+
+Materials used in the course are listed below.
+
+The GitHub repository for this course is located at [https://github.com/erikwestlund/data-viz-summer-25](https://github.com/erikwestlund/data-viz-summer-25).
+
+*Note*: This page is automatically generated.
+
 
 ## Lectures
 
@@ -12,11 +20,26 @@ format: html
 
 # Function to format link text
 format_link_text <- function(text) {
+  # Handle applications_{n}_ prefix
+  if (grepl("^applications_\\d+_", text)) {
+    text <- sub("^applications_\\d+_", "Applications: ", text)
+  }
+  
+  # Handle prams_{n}_ prefix
+  if (grepl("^prams_\\d+_", text)) {
+    # Extract the number
+    n <- sub("^prams_(\\d+)_.*", "\\1", text)
+    text <- sub("^prams_\\d+_", paste0("PRAMS ", n, ": "), text)
+  }
+  
   # Special cases to handle first
   special_cases <- list(
     "ai" = "AI",
     "llm" = "LLM",
-    "ggplot" = "ggplot"
+    "ggplot" = "ggplot",
+    "Prams" = "PRAMS",
+    "prams" = "PRAMS",  
+    "dag" = "DAG"
   )
   
   # Split by underscores
@@ -33,7 +56,12 @@ format_link_text <- function(text) {
   })
   
   # Join with spaces
-  return(paste(words, collapse = " "))
+  str <- paste(words, collapse = " ")
+  
+  # Replace any dangling instances of "Ggplot" with "ggplot"
+  str <- gsub("Ggplot", "ggplot", str)
+  
+  return(str)
 }
 
 # Function to get all HTML files in a directory
@@ -71,3 +99,14 @@ knitr::asis_output(get_html_files("examples", "examples"))
 # Get and display postmortem links
 knitr::asis_output(get_html_files("postmortems", "postmortems"))
 ```
+
+## Credits
+
+* All files on this page were created with [Quarto](https://quarto.org/). Students were likewise encouraged to use Quarto to create their own visualizations.
+* A major debt is owed to Kieran Healy for his [Data Visualization book](https://socviz.co/).
+* Many of the materials here were first developed for the [Johns Hopkins Maternal Health Data Innovation and Coordinating Hub](https://maternalhealthhub.jhu.edu/johns-hopkins-university#:~:text=The%20Hub%20is%20a%20multidisciplinary,Medicine%20at%20Johns%20Hopkins%20University) of the [NIH Maternal Health Research Centers of Excellence](https://www.nih.gov/news-events/news-releases/nih-establishes-maternal-health-research-centers-excellence).
+* LLMs were used to aid in creation of many of the visuals in this course. Any mistakes made by LLMs are ultimately my own.
+
+## Contact
+
+I can be reached at [ewestlund@jhu.edu](mailto:ewestlund@jhu.edu).
