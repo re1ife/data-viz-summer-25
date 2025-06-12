@@ -198,6 +198,31 @@ compile_directory <- function(dir_path, output_dir) {
   }
 }
 
+# Function to clean up output directories while preserving index files
+cleanup_output_dirs <- function() {
+  cli_alert_info("Cleaning up output directories...")
+  
+  # List of directories to clean
+  dirs_to_clean <- c(LECTURES_DIR, EXAMPLES_DIR, POSTMORTEMS_DIR)
+  
+  for (dir in dirs_to_clean) {
+    if (dir_exists(dir)) {
+      # List all files and directories
+      items <- dir_ls(dir, all = TRUE)
+      
+      # Remove each item
+      for (item in items) {
+        if (dir_exists(item)) {
+          dir_delete(item)
+        } else {
+          file_delete(item)
+        }
+      }
+      cli_alert_success("Cleaned directory: {dir}")
+    }
+  }
+}
+
 # Main compilation process
 cli_h1("Starting Compilation Process")
 
@@ -206,6 +231,9 @@ ensure_dir(RENDERED_DIR)
 ensure_dir(LECTURES_DIR)
 ensure_dir(EXAMPLES_DIR)
 ensure_dir(POSTMORTEMS_DIR)
+
+# Clean up existing files in output directories
+cleanup_output_dirs()
 
 # Compile lectures (slides) directly to slides directory
 cli_h2("Compiling Lectures")

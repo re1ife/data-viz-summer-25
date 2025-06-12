@@ -15,6 +15,7 @@ required_packages <- c(
   "dplyr",
   "ggplot2",
   "broom.mixed",
+  "kableExtra",
   "lme4",
   "readr",
   "emmeans"
@@ -25,12 +26,9 @@ new_packages <- required_packages[!(required_packages %in% installed.packages()[
 if(length(new_packages)) install.packages(new_packages)
 
 # Load all packages
-library(dplyr)
-library(ggplot2)
-library(broom.mixed)
-library(lme4)
-library(readr)
-library(emmeans)
+for (package in required_packages) {
+  library(package, character.only = TRUE)
+}
 
 source(here::here("examples", "colors.R"))
 set.seed(123)
@@ -226,10 +224,10 @@ Each point shows the estimated log-odds of receiving comprehensive care associat
 #| fig.width: 12
 
 # Get fixed effects with confidence intervals
-fixed_effects <- tidy(model, conf.int = TRUE) %>%
-  filter(effect == "fixed") %>%
+fixed_effects <- tidy(model, conf.int = TRUE) |>
+  filter(effect == "fixed") |>
   # Remove any NA values
-  filter(!is.na(estimate)) %>%
+  filter(!is.na(estimate)) |>
   # Create a more readable term name
   mutate(term = case_when(
     term == "(Intercept)" ~ "Intercept",
@@ -283,7 +281,7 @@ library(emmeans)
 
 # Race/Ethnicity
 race_probs <- emmeans(model, ~ race_ethnicity, type = "response")
-race_probs_df <- as.data.frame(race_probs) %>%
+race_probs_df <- as.data.frame(race_probs) |>
   mutate(
     group = "Race/Ethnicity",
     category = case_when(
@@ -299,7 +297,7 @@ race_probs_df <- as.data.frame(race_probs) %>%
 
 # Insurance
 insurance_probs <- emmeans(model, ~ insurance, type = "response")
-insurance_probs_df <- as.data.frame(insurance_probs) %>%
+insurance_probs_df <- as.data.frame(insurance_probs) |>
   mutate(
     group = "Insurance",
     category = case_when(
@@ -313,7 +311,7 @@ insurance_probs_df <- as.data.frame(insurance_probs) %>%
 
 # Medical Conditions
 conditions_probs <- emmeans(model, ~ multiple_gestation + placenta_previa + gest_hypertension + preeclampsia, type = "response")
-conditions_probs_df <- as.data.frame(conditions_probs) %>%
+conditions_probs_df <- as.data.frame(conditions_probs) |>
   mutate(
     group = "Medical Conditions",
     category = case_when(
@@ -323,15 +321,15 @@ conditions_probs_df <- as.data.frame(conditions_probs) %>%
       preeclampsia == 1 ~ "Preeclampsia",
       TRUE ~ "No Medical Conditions"
     )
-  ) %>%
+  ) |>
   # Remove duplicates where multiple conditions are true
   distinct(category, .keep_all = TRUE)
 
 # Combine all predictions
 all_probs <- bind_rows(
-  race_probs_df %>% select(group, category, prob, asymp.LCL, asymp.UCL),
-  insurance_probs_df %>% select(group, category, prob, asymp.LCL, asymp.UCL),
-  conditions_probs_df %>% select(group, category, prob, asymp.LCL, asymp.UCL)
+  race_probs_df |> select(group, category, prob, asymp.LCL, asymp.UCL),
+  insurance_probs_df |> select(group, category, prob, asymp.LCL, asymp.UCL),
+  conditions_probs_df |> select(group, category, prob, asymp.LCL, asymp.UCL)
 )
 
 # Create faceted plot
@@ -396,3 +394,350 @@ ggplot(random_effects_data, aes(x = condval, y = reorder(grp, condval))) +
 # Print model summary
 summary(model)
 ```
+
+## Interaction Effects
+
+The `emmeans` package can also be used to help visualize interaction effects. Let's simulate some data with an interaction effect.
+
+### Interaction Between Categorical and Continuous Variable
+
+In this example, we simulate data to study how different exercise programs might be more or less effective depending on a person's starting fitness level. We have:
+
+- A categorical predictor: Type of exercise program
+  - High-Intensity Interval Training (HIIT): Short bursts of intense exercise followed by rest
+  - Strength Training: Weight lifting and resistance exercises
+  - Cardio: Steady-state aerobic exercise like jogging or cycling
+- A continuous predictor: Baseline fitness level (on a 1-10 scale)
+- An outcome: Weight loss in pounds
+
+The key question is whether the effectiveness of each program depends on how fit someone is when they start. For example, HIIT might be more effective for people who are already somewhat fit, while Cardio might be better for beginners. The relationship between program type and weight loss changes depends on baseline fitness.
+
+Each program has:
+
+- A baseline effectiveness (how much weight loss we expect at average fitness levels)
+- A different rate of effectiveness based on baseline fitness (how much more or less effective it becomes as fitness changes)
+- Some random variation to account for individual differences
+
+```{r interaction_effects}
+#| fig.height: 8
+#| fig.width: 12
+
+# Simulate data with an interaction effect
+set.seed(123)
+n <- 500
+
+# Simulate data for program × fitness interaction
+ix_data <- data.frame(
+  # Categorical predictor: Exercise program type
+  program = sample(c("HIIT", "Strength Training", "Cardio"), 
+                  size = n, replace = TRUE),
+  # Continuous predictor: Baseline fitness level (1-10 scale)
+  baseline_fitness = runif(n, min = 1, max = 10),
+  # Add some noise
+  error = rnorm(n, 0, 2)
+) |>
+  # Create interaction effect
+  mutate(
+    # Center the baseline fitness
+    baseline_fitness_centered = baseline_fitness - mean(baseline_fitness),
+    # Different slopes for different programs
+    fitness_effect = case_when(
+      program == "HIIT" ~ 0.8,
+      program == "Strength Training" ~ 0.5,
+      program == "Cardio" ~ 0.3
+    ),
+    # Different intercepts for different programs
+    program_effect = case_when(
+      program == "HIIT" ~ 8.0,
+      program == "Strength Training" ~ 6.0,
+      program == "Cardio" ~ 4.0
+    ),
+    # Calculate outcome: Weight loss in pounds
+    weight_loss = program_effect + (fitness_effect * baseline_fitness_centered) + error
+  )
+```
+Let's fit a model to the simulated data.
+
+```{r interaction_model}
+#| message: false
+
+model <- lm(weight_loss ~ program * baseline_fitness_centered, data = ix_data)
+model |> tidy() |> kable()
+```
+
+We get results back. We have "main effects" for the program type and the baseline fitness level, and an interaction effect between the two.
+
+Centering helps: The intercept represents the expected weight loss when baseline fitness is at its mean. 
+
+The `emmeans` package can help us interpret. Let's get it to give us the predicted weight loss at the average fitness level.
+
+```{r interaction_plot}
+#| fig.height: 8
+#| fig.width: 12
+
+# Plot the interaction
+emmeans(model, ~ program | baseline_fitness_centered)
+```
+
+We see that this lines up with our model results:
+
+* Cardio: 4.16 lbs (intercept)
+* HIIT: 7.89 lbs  (4.16 + 3.73 = 7.89)
+* Strength Training: 6.08 lbs (4.16 + 1.92 = 6.08)
+
+But what if we want to see the relationship between program type and weight loss at different baseline fitness levels? Let's create a plot that shows how weight loss changes across the full range of baseline fitness for each program.
+
+We can use `emmip()` (expected means interaction plot)to plot the predicted weight loss by program type at different baseline fitness levels. We add some text to the plot to show the slopes for each program.
+
+```{r interaction_plot_2}
+#| fig.height: 8
+#| fig.width: 12
+# Create baseline fitness values in the original (uncentered) scale
+
+
+# Get centered values based on the observed data range
+centered_range <- range(ix_data$baseline_fitness - mean(ix_data$baseline_fitness))
+centered_vals <- seq(centered_range[1], centered_range[2], length.out = 100)
+
+# Create the plot
+emmip(
+  model,
+  program ~ baseline_fitness_centered,
+  at = list(baseline_fitness_centered = centered_vals),
+  type = "response"
+) +
+  labs(
+    title = "Predicted Weight Loss by Program and Baseline Fitness",
+    x = "Baseline Fitness Level (Centered)",
+    y = "Predicted Weight Loss (pounds)",
+    color = "Program Type"
+  ) +
+  scale_x_continuous(
+    breaks = seq(-5, 5, by = 1),
+    labels = seq(-5, 5, by = 1)
+  ) +
+  annotate("text", x = 3.5, y = 4.5, label = "Cardio slope: 0.30", color = "#F8766D", hjust = 0) +
+  annotate("text", x = 3.5, y = 10.5, label = "HIIT slope: 0.79", color = "#00BA38", hjust = 0) +
+  annotate("text", x = 3.5, y = 7.5, label = "Strength slope: 0.56", color = "#619CFF", hjust = 0) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    legend.position = "bottom"
+  )
+```
+
+I find this a lot easier to interpret than the table of results. "Seeing is believing."
+
+## More Complexity: Categorical by Continuous by Continuous Interaction
+
+Let's simulate data to get a sense of a complex set of interactions. 
+
+We will create a simulated dataset that explores how lung function is influenced by age, air pollution exposure, and smoking status. Both age and pollution independently reduce lung function, but the negative effect of pollution becomes more pronounced as people get older, so pollution is more damaging to lung function in older adults than in younger ones. Moreover, smoking increases the effect of pollution on lung function.
+
+* `fev1` = forced expiratory volume in one second
+* `age` = age, which can be 30-80
+* `pm25` = particulate matter exposure
+* `is_smoker` = whether the person is a smoker
+
+```{r continuous_interaction_data}
+#| message: false
+
+set.seed(123)
+n <- 300
+age <- runif(n, 30, 80)              # Age 30–80
+pm25 <- runif(n, 5, 35)              # PM2.5 range
+interaction_effect <- -0.01          # Base moderation: steeper slope with age
+
+# Add smoking status (binary)
+# More likely to have smoking history as age increases
+smoking_prob <- 0.2 + (age - 30)/100  # Probability increases with age
+is_smoker <- rbinom(n, 1, smoking_prob)
+
+# Create age-dependent error term (more variation with age)
+age_error <- rnorm(n, 0, 0.2 * (1 + (age - 30)/50))  # Error increases with age
+
+# Outcome: base lung function + age effect + pollution effect + 
+# two-way interactions + three-way interaction + smoking effect
+# Please note how are simulated data looks like the model we are going to estimate.
+# Simulating data is a great way to undrestand how models work.
+# In fact, if you uncenter the below model, you will see that the coefficients are very close to what we define below.
+fev1 <- 4.5 - # intercept
+        0.02*age - # age effect
+        0.03*pm25 + # pollution effect
+        interaction_effect * age * pm25 -  # age × pollution
+        0.5*is_smoker +                    # smoking main effect
+        0.02*age*is_smoker +               # age × smoking
+        0.01*pm25*is_smoker +              # pollution × smoking
+        -0.005*age*pm25*is_smoker +        # three-way interaction
+        age_error
+
+# Create data frame
+data <- data.frame(age, pm25, fev1, is_smoker)
+data |> head() |> kable()
+```
+
+A starting point for an interaction analysis is to color code by group and look at the trends. Let's create age bins and plot out the trends, faceting by smoker status.
+
+We clearly see a slope difference by age. We also see that all the slopes of smokers appear to be steeper than the slopes of non-smokers.
+
+```{r continuous_interaction_plot_2}
+#| fig.height: 8
+#| fig.width: 12
+
+data |> 
+  mutate(
+    age_group = cut(age, breaks = c(30, 40, 50, 60, 70, 80), 
+                   labels = c("30-39", "40-49", "50-59", "60-69", "70+")),
+    smoking_status = ifelse(is_smoker == 1, "Smoker", "Non-smoker")
+  ) |> 
+  ggplot(aes(x = pm25, y = fev1, color = age_group)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ smoking_status) +
+  labs(
+    title = "Lung Function by Air Pollution and Age Group",
+    subtitle = "Faceted by Smoking Status",
+    x = "PM2.5 Exposure",
+    y = "FEV1 (L)",
+    color = "Age Group"
+  ) +
+  theme_minimal() +
+  theme(
+    strip.text = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+
+# Show variation by age group and smoking status
+data |>
+  mutate(
+    age_group = cut(age, breaks = c(30, 40, 50, 60, 70, 80), 
+                   labels = c("30-39", "40-49", "50-59", "60-69", "70+")),
+    smoking_status = ifelse(is_smoker == 1, "Smoker", "Non-smoker")
+  ) |>
+  group_by(age_group, smoking_status) |>
+  summarize(
+    mean_fev1 = mean(fev1),
+    sd_fev1 = sd(fev1),
+    min_fev1 = min(fev1),
+    max_fev1 = max(fev1),
+    n = n()
+  ) |>
+  kable()
+```
+
+Now let's center our variables and fit a model with the three-way interaction.
+
+```{r continuous_interaction_model}
+#| message: false
+
+data <- data |> 
+  mutate(
+    pm25_centered = pm25 - mean(pm25),
+    age_centered = age - mean(age)
+  )
+
+model <- lm(fev1 ~ pm25_centered * age_centered * is_smoker, data = data)
+model |> tidy() |> kable()
+```
+
+We see that the interaction terms in our regression model are statistically significant, but interpreting them directly from the table is very difficult. This is especially true in models with two or more continuous predictors interacting, and even more so when one of them is also interacting with a binary group.
+
+Take the main effects: `pm25_centered` and `age_centered`. These coefficients only describe the effect of PM2.5 or age at the average level of the other variable. For example, the coefficient for PM2.5 tells us how pollution affects FEV1 only at the mean age in our sample. That’s not very useful unless you already know what the mean is, and even then, it’s just a narrow slice of the story.
+
+Now add in interaction terms like `pm25` × `age` or `pm25` × `age` × `is_smoker`, and things get more abstract. What does a coefficient of –0.01 for `pm25` × `age` actually mean? Technically, it means the effect of PM2.5 on lung function gets more negative as age increases, but:
+
+  - How much more?
+  - Is that change clinically meaningful?
+  - Does the slope actually flip direction at some point?
+  - Is the effect stronger in smokers than non-smokers?
+
+You could try to work this out by multiplying coefficients in your head, but if you're like me, then you're not smart enough. Better to use visualization to help.
+
+`emmeans` can help us by generating predicted values and estimated trends. It also allows us to probe the model and "un-center" the data for interpretation. 
+
+For example, we can explore how the slope of PM2.5 on FEV1 changes at different ages, and see how those slopes differ by smoking status. Using `emtrends()`, we can even extract the actual slope estimates by subgroup, turning abstract interactions into tangible comparisons.
+
+
+```{r continuous_interaction_plot_3}
+#| fig.height: 8
+#| fig.width: 12
+
+# Get centering values
+mean_age <- mean(data$age)
+mean_pm25 <- mean(data$pm25)
+
+# Define values for uncentered age and PM2.5
+age_vals <- c(40, 50, 60, 70, 80)
+pm25_vals <- seq(5, 35, length.out = 100)
+
+# Centered versions to use in emmip
+age_centered_vals <- age_vals - mean_age
+pm25_centered_vals <- pm25_vals - mean_pm25
+
+# 1. Get predicted values with emmip, grouped by smoking status
+pred_data <- emmip(
+  model,
+  age_centered ~ pm25_centered | is_smoker,
+  at = list(
+    age_centered = age_centered_vals,
+    pm25_centered = pm25_centered_vals,
+    is_smoker = c(0, 1)
+  ),
+  type = "response",
+  plotit = FALSE
+)
+
+# Uncenter for plotting
+pred_data <- pred_data |>
+  mutate(
+    age = age_centered + mean_age,
+    pm25 = pm25_centered + mean_pm25,
+    smoker_label = ifelse(is_smoker == 1, "Smoker", "Non-smoker")
+  )
+
+# 2. Get slopes of PM2.5 at each age × smoking status
+slopes <- emtrends(
+  model,
+  ~ age_centered * is_smoker,
+  var = "pm25_centered",
+  at = list(age_centered = age_centered_vals, is_smoker = c(0, 1))
+) |>
+  as.data.frame() |>
+  mutate(
+    age = age_centered + mean_age,
+    smoker_label = ifelse(is_smoker == 1, "Smoker", "Non-smoker"),
+    label = paste0("Slope: ", round(pm25_centered.trend, 3))
+  )
+
+# 3. Plot
+ggplot(pred_data, aes(x = pm25, y = yvar, color = factor(age), group = interaction(age, smoker_label))) +
+  geom_line(linewidth = 1) +
+  geom_text(
+    data = pred_data |>
+      group_by(age, smoker_label) |>
+      slice_max(pm25) |>
+      left_join(slopes, by = c("age", "smoker_label")),
+    aes(x = pm25, y = yvar, label = label, color = factor(age)),
+    hjust = -0.1,
+    size = 3.5,
+    inherit.aes = FALSE,
+    show.legend = FALSE
+  ) +
+  facet_wrap(~ smoker_label) +
+  labs(
+    title = "Predicted Lung Function by PM2.5 and Age, with Smoking Interaction",
+    subtitle = "Slopes of PM2.5 Effect Vary by Age and Smoking Status",
+    x = "PM2.5 (μg/m³)",
+    y = "Predicted FEV1",
+    color = "Age"
+  ) +
+  xlim(min(pm25_vals), max(pm25_vals) + 5) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+    plot.subtitle = element_text(hjust = 0.5),
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold")
+  )
+```
+

@@ -34,16 +34,9 @@ new_packages <- required_packages[!(required_packages %in% installed.packages()[
 if(length(new_packages)) install.packages(new_packages)
 
 # Load all packages
-library(dplyr)
-library(ggplot2)
-library(tidyr)
-library(here)
-library(lubridate)
-library(networkD3)
-library(plotly)
-library(viridis)
-library(htmltools)
-library(htmlwidgets)
+for (package in required_packages) {
+  library(package, character.only = TRUE)
+}
 
 # Set theme
 theme_set(theme_minimal() +
@@ -113,7 +106,10 @@ time_data <- time_data |>
 #| message: false
 
 # Create basic time series plot
-p_time <- ggplot(time_data, aes(x = date, y = value)) +
+p_time <- 
+  
+  
+ggplot(time_data, aes(x = date, y = value)) +
   # Add points
   geom_point(
     size = 2,
@@ -268,15 +264,15 @@ p_time_lm <- ggplot(time_data, aes(x = date, y = value)) +
     "segment",
     x = as.Date("2023-11-15"),
     xend = as.Date("2024-01-01"),
-    y = 180,
-    yend = 180,
+    y = 150,
+    yend = 150,
     arrow = arrow(length = unit(0.2, "cm"), ends = "last", type = "closed"),
     color = "red"
   ) +
   annotate(
     "text",
     x = as.Date("2023-11-15"),
-    y = 180,
+    y = 150,
     label = "Intervention\nStarted",
     hjust = 1.1,
     color = "red",
@@ -315,6 +311,9 @@ p_time_lm <- ggplot(time_data, aes(x = date, y = value)) +
     axis.title = element_text(size = 10, face = "bold"),
     axis.text = element_text(size = 8),
     panel.grid.minor = element_blank()
+  ) +
+  scale_y_continuous(
+    limits = c(0, 180)
   )
 
 p_time_lm

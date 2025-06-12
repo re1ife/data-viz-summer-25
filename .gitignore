@@ -78,9 +78,6 @@ Thumbs.db
 *.tmp
 *.temp
 
-# Data directory
-data/
-
 # Quarto generated files
 _site/
 _freeze/

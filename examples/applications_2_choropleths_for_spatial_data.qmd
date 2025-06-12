@@ -30,18 +30,9 @@ new_packages <- required_packages[!(required_packages %in% installed.packages()[
 if(length(new_packages)) install.packages(new_packages)
 
 # Load all packages
-library(readr)
-library(dplyr)
-library(ggplot2)
-library(forcats)
-library(tidyr)
-library(kableExtra)
-library(stringr)
-library(ggrepel)
-library(maps)
-library(usmap)
-library(sf)
-
+for (package in required_packages) {
+  library(package, character.only = TRUE)
+}
 source(here::here("examples", "colors.R"))
 ```
 

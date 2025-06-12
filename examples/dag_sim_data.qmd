@@ -459,7 +459,7 @@ analysis_data <- data |> select(
     race_ethnicity = race
   )
 
-readr::write_csv(analysis_data, here::here("data/processed/simulated_maternal_health_data.csv")) 
+readr::write_csv(analysis_data, here::here("data/processed/simulated_data.csv")) 
 
 ```
 
