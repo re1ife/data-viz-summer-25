@@ -17,6 +17,9 @@ We will use Kieran Healy's **Data Visualization: A Practical Introduction**, [av
 ```
 ├── assignments/       # Course assignments
 ├── data/              # Selected data sets
+├── data/raw/          # Raw data sets we rely upon
+├── data/processed     # Processed data sets created by course files
+├── docs/              # Rendered notebooks for the course website
 ├── lectures/          # Course lecture materials and slides
 ├── examples/          # Worked examples and code samples
 ├── work/              # Student work and assignments (your work goes here)
@@ -80,6 +83,12 @@ If you get prompted with a screen full of changes in the `vim` editor, you can t
 - By keeping your work in the `work/` directory, you can safely pull updates from the original repository without conflicts
 - If you need to experiment or try things out, use the `scratch/` directory (it's gitignored)
 - If you modify files outside the `work/` directory, you may encounter merge conflicts when trying to pull updates from the original repository.
+
+## Credits
+
+* A major debt is owed to Kieran Healy for his [Data Visualization book](https://socviz.co/).
+* Many of the materials here were first developed for the [Johns Hopkins Maternal Health Data Innovation and Coordinating Hub](https://maternalhealthhub.jhu.edu/johns-hopkins-university#:~:text=The%20Hub%20is%20a%20multidisciplinary,Medicine%20at%20Johns%20Hopkins%20University) of the [NIH Maternal Health Research Centers of Excellence](https://www.nih.gov/news-events/news-releases/nih-establishes-maternal-health-research-centers-excellence).
+* LLMs were used to aid in creation of many of the visuals in this course. Any mistakes made by LLMs are ultimately my own.
 
 ## Author
 
