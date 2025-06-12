@@ -230,7 +230,7 @@ We will also demonstrate the process of iterating on a figure to make it more in
 
 ## Example
 
-* In the `examples/colors_example.qmd` file, we will explore the use of color design systems and perceptually uniform colors
+* In the `examples/colors_and_accessibility.qmd` file, we will explore the use of color design systems and perceptually uniform colors
 
 
 

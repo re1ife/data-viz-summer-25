@@ -409,6 +409,11 @@ complete_dag |>
 * In `applications_6_visualizing_correlations_and_models.qmd` we visualize correlations and model outputs
 * We'll look at why it's important to visualize correlations and model outputs
 
+## Application 7: Saving Visualizations
+
+* In `applications_7_saving_visuals.qmd` we save our visualizations
+* We'll look at how to save visualizations in a variety of formats
+
 
 # Summary and Takeaways
 

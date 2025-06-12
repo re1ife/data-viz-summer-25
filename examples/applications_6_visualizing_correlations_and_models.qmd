@@ -1,5 +1,5 @@
 ---
-title: "Application 6: VisualizingCorrelations and Models"
+title: "Application 6: Visualizing Correlations and Models"
 author: "Erik Westlund"
 date: "2025-06-12"
 
