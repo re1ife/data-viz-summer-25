@@ -131,7 +131,7 @@ p_time <- ggplot(time_data, aes(x = date, y = value)) +
   labs(
     title = "Weekly Physical Activity Over Time",
     subtitle = "Intervention implemented at 1 year (dashed line)",
-    x = "Date",
+    x = NULL,
     y = "Minutes of Activity"
   ) +
   # Customize theme
@@ -180,7 +180,7 @@ p_time_smooth <- ggplot(time_data, aes(x = date, y = value)) +
   labs(
     title = "Weekly Physical Activity Over Time with Smoother",
     subtitle = "Intervention implemented at 1 year (dashed line)",
-    x = "Date",
+    x = NULL,
     y = "Minutes of Activity"
   ) +
   # Customize theme
@@ -291,7 +291,7 @@ p_time_lm <- ggplot(time_data, aes(x = date, y = value)) +
   labs(
     title = "Weekly Physical Activity Over Time",
     subtitle = "Linear trends before and after intervention",
-    x = "Date",
+    x = NULL,
     y = "Minutes of Activity"
   ) +
   # Customize theme
@@ -460,7 +460,7 @@ p_weight <- ggplot(daily_averages, aes(x = date, y = avg_weight, color = gender)
   # Add labels
   labs(
     title = "Average Weight Over Time by Gender",
-    x = "Date",
+    x = NULL,
     y = "Weight (lbs)",
     caption = "Shaded area indicates holiday season (November 1 - December 31).\nText annotations show average weights on November 1 and December 31."
   ) +
@@ -498,6 +498,7 @@ p_weight
 ```{r treatment_patterns}
 #| fig.height: 10
 #| message: false
+#| warning: false
 
 # Create treatment pattern data
 set.seed(123)
