@@ -29,10 +29,36 @@ library(stringr)
 library(kableExtra)
 ```
 
+# Housekeeping
 
-# Day 3: What to Visualize – From Question to Plot
+## Problem Set 3 & Final Project
+
+- The final problem set is due tomorrow. 
+- The final project is due in three weeks, on July 3rd. 
+- Review the final assignment sheet on CoursePlus or [GitHub](https://github.com/erikwestlund/data-viz-summer-25/blob/main/assignments/Final%20Project.docx)
+- Submit all assignments via email or on CoursePlus
+- I prefer you put your work in the `work` directory on your GitHub repository fork
+
+## Final Project
+
+- Email it to me or submit it on CoursePlus
+- Basic requirements:
+  - Submit a rendered notebook
+  - Each visualizatoin needs a justification
+  - 10 visualizations total
+  - 5 can be univariate
+  - 5 must have at least two variables
+  - 2 must have three or more
+  - Make them polished
+
+## Support
+
+- Please feel free to reach out to me via email or Teams
+- I am happy to meet with you on Zoom to discuss your work and answer questions
 
 ## Overview for Day 3
+
+# Day 3: What to Visualize – From Question to Plot
 
 ::: {.incremental}
 - Scientific questions and DAGs
@@ -376,6 +402,18 @@ complete_dag |>
 * In `examples/dag_sim_data.qmd` we simulated data that encodes the DAG structure.
 * Let's take a very brief glance at that file to see how we simulated the data.
 
+# Worfklow
+
+## Workflow: `ggplot` themes Staying DRY
+
+* In `ggplot_themes_and_staying_dry.qmd` we explore how to make a `ggplot` theme 
+* We also discuss how to `stay DRY` (Don't Repeat Yourself) when working with multifile notebooks
+
+## Workflow: Saving Visualizations
+
+* In `saving_visualizations.qmd` I show how to export/save visualizations
+* This includes some guidance on file format choices and best practices
+
 # Applications
 
 ## Application 1: Effective and Honest Scales
@@ -409,10 +447,6 @@ complete_dag |>
 * In `applications_6_visualizing_correlations_and_models.qmd` we visualize correlations and model outputs
 * We'll look at why it's important to visualize correlations and model outputs
 
-## Application 7: Saving Visualizations
-
-* In `applications_7_saving_visuals.qmd` we save our visualizations
-* We'll look at how to save visualizations in a variety of formats
 
 
 # Summary and Takeaways
