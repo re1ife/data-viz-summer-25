@@ -7,6 +7,11 @@ editor:
   render-on-save: true
 ---
 
+## Time Series Plots
+
+Time series plots are a common way to visualize data over time. They are useful for showing trends and patterns in data over time.
+
+
 ```{r setup}
 #| include: false
 
@@ -148,6 +153,10 @@ p_time <- ggplot(time_data, aes(x = date, y = value)) +
 p_time
 ```
 
+## Time Series Plots with Smoothers
+
+Smoothers are a common way to visualize trends in data over time. Below, we use a loess smoother to visualize the trend in the data.
+
 ```{r time_series_smooth}
 #| fig.height: 5
 #| message: false
@@ -196,6 +205,9 @@ p_time_smooth <- ggplot(time_data, aes(x = date, y = value)) +
 
 p_time_smooth
 ```
+## Interrupted Time Series Plots
+
+Interrupted time series plots are a common way to visualize the effect of an intervention on a time series. Below, we fit a linear model to the data before and after the intervention and visualize the trend in the data before and after the intervention. We annotate the plot with the average weight before and after the intervention. This specific example visualized a "regression discontinuity" design.
 
 ```{r time_series_lm}
 #| fig.height: 5
@@ -307,6 +319,12 @@ p_time_lm <- ggplot(time_data, aes(x = date, y = value)) +
 
 p_time_lm
 ```
+
+## Using Labels, Shading, and Annotations
+
+We can use labels, shading, and annotations to add additional information to our plots.
+
+
 
 ```{r weight_time_series}
 #| fig.height: 5
@@ -495,6 +513,10 @@ p_weight <- ggplot(daily_averages, aes(x = date, y = avg_weight, color = gender)
 p_weight
 ```
 
+## Sankey Diagrams
+
+Sankey diagrams are a common way to visualize the flow of data. Below, we create a Sankey diagram to visualize simulated data of patients with hypertension who change treatments over time.
+
 ```{r treatment_patterns}
 #| fig.height: 10
 #| message: false
@@ -586,6 +608,22 @@ p_sankey <- htmlwidgets::prependContent(
   htmltools::tags$h3("Hypertension Treatment Pattern Flow Over Time")
 )
 
+p_sankey
+```
+
+## Sunburst Plots
+
+Sunburst plots are another common way to visualize the flow of data. Below, we create a Sunburst plot to visualize the distribution of patients with hypertension who change treatments over time. 
+
+These show the distribution of patients by treatment at each stage of the process, using color to indicate the treatment at each stage.
+
+
+```{r sunburst}
+#| fig.height: 10
+#| message: false
+#| warning: false
+
+
 # Create Sunburst plot data
 # Create properly formatted sunburst data with three levels
 sunburst_data <- patient_data |>
@@ -651,7 +689,7 @@ p_sunburst <- plot_ly(
   )
 
 # Display plots
-p_sankey
 p_sunburst
+
 ```
 
