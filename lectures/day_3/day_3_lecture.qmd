@@ -31,6 +31,12 @@ library(kableExtra)
 
 # Housekeeping
 
+## Course Evaluations
+
+* JHSPH aims for 100% course evaluation completion
+* Please complete the course evaluation by [https://courseevalsystem.jhsph.edu/](following this link).
+* I will follow up with an email reminder or tow.
+
 ## Problem Set 3 & Final Project
 
 - The final problem set is due tomorrow. 
@@ -41,8 +47,8 @@ library(kableExtra)
 
 ## Final Project
 
-- Email it to me or submit it on CoursePlus
-- Basic requirements:
+* Email it to me or submit it on CoursePlus
+* Basic requirements:
   - Submit a rendered notebook
   - Each visualizatoin needs a justification
   - 10 visualizations total

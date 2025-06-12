@@ -207,7 +207,7 @@ p_time_smooth
 ```
 ## Interrupted Time Series Plots
 
-Interrupted time series plots are a common way to visualize the effect of an intervention on a time series. Below, we fit a linear model to the data before and after the intervention and visualize the trend in the data before and after the intervention. We annotate the plot with the average weight before and after the intervention. This specific example visualized a "regression discontinuity" design.
+Interrupted time series plots are a common way to visualize the effect of an intervention on a time series. Below, we fit a linear model to the data before and after the intervention and visualize the trend in the data before and after the intervention. We annotate the plot with the average weight before and after the intervention. This specific example a "regression discontinuity" design.
 
 ```{r time_series_lm}
 #| fig.height: 5
@@ -271,7 +271,7 @@ p_time_lm <- ggplot(time_data, aes(x = date, y = value)) +
     y = 180,
     yend = 180,
     arrow = arrow(length = unit(0.2, "cm"), ends = "last", type = "closed"),
-    color = "darkred"
+    color = "red"
   ) +
   annotate(
     "text",
@@ -279,7 +279,7 @@ p_time_lm <- ggplot(time_data, aes(x = date, y = value)) +
     y = 180,
     label = "Intervention\nStarted",
     hjust = 1.1,
-    color = "darkred",
+    color = "red",
     fontface = "bold"
   ) +
   # Add average annotations
@@ -403,8 +403,8 @@ annotations <- daily_averages |>
       TRUE ~ date + 56                # Dodge right for December
     ),
     text_y = case_when(
-      gender == "Male" ~ 185,  # Fixed position for men
-      TRUE ~ 155               # Fixed position for women
+      gender == "Female" ~ 150,  # Fixed position for men (lowered from 155)
+      TRUE ~ 185               # Fixed position for women
     )
   )
 
@@ -502,10 +502,10 @@ p_weight <- ggplot(daily_averages, aes(x = date, y = avg_weight, color = gender)
   # Use different colors for genders
   scale_color_manual(
     values = c(
-      "Male" = "darkblue",
-      "Female" = "darkred"
+      "Male" = "red",
+      "Female" = "darkblue"
     ),
-    labels = c("Men", "Women")
+    labels = c("Women", "Men")
   ) +
   # Remove rect from legend and fix the "a" issue
   guides(color = guide_legend(override.aes = list(shape = NA, fill = NA, linetype = 1, label = NULL, text = NULL)))
