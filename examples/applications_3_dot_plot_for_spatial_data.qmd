@@ -66,13 +66,13 @@ data <- data |>
   )
 
 data$self_report_income <- factor(data$self_report_income, levels = c(
-  "0–$25,000",
-  "$25,000–$50,000",
-  "$50,000–$75,000",
-  "$75,000–$100,000",
-  "$100,000–$125,000",
-  "$125,000–$150,000",
-  "$150,000–$175,000",
+  "$0–$24,999",
+  "$25,000–$49,999",
+  "$50,000–$74,999",
+  "$75,000–$99,999",
+  "$100,000–$124,999",
+  "$125,000–$149,999",
+  "$150,000–$174,999",
   "$175,000+"
 ))
 
@@ -167,4 +167,91 @@ We find that, in fact, the dot plot is superior to the choropleth map to visuali
 
 I would encourage you to always try to visualize spatial data using non-map-based visualizations. In many cases, maps foreground non-causal phenomena like population density.
 
-For comparison, compare the above to the choropleth map we made in `applications_2_choropleth.qmd`.
+For comparison, compare the above to the choropleth map we made in `applications_2_choropleth.qmd`, which we reproduce below:
+
+
+
+```{r}
+#| echo: false
+
+us_map <- us_map(regions = "states")
+
+rcp_by_state_data <- data |>
+  group_by(state) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care),
+    n = n()
+  ) |>
+  ungroup()
+
+# Merge summarized data with map data
+rcp_by_state_data_mappable <- us_map |>
+  left_join(
+    rcp_by_state_data, 
+    by = c("abbr"="state")
+  )
+
+ggplot(data = rcp_by_state_data_mappable) +
+  geom_sf(aes(fill = proportion), color = "white") +
+  scale_fill_continuous(
+    low = colors$blue$`50`,
+    high = colors$blue$`900`,
+    name = "Proportion",
+    labels = scales::percent,
+  ) +
+  labs(
+    title = "Proportion Receiving Comprehensive Postnatal Care By State",
+    caption = "Source: Simulated Data"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold")
+  )
+
+# Will it work? Maps  by state
+race_ethnicity_care_data <- data |>
+  group_by(state, race_ethnicity) |>
+  summarize(
+    proportion = mean(received_comprehensive_postnatal_care, na.rm = TRUE),
+    n = n(),
+    	.groups = "drop"
+  ) |>
+  ungroup() |>
+  mutate(
+    race_ethnicity = fct_recode(race_ethnicity, !!!race_ethnicity_labels)
+  )
+
+race_ethnicity_care_sf <- us_map |>
+  left_join(
+	race_ethnicity_care_data,
+	by = c("abbr" = "state")
+  )
+
+ggplot(race_ethnicity_care_sf) +
+  geom_sf(aes(geometry = geom, fill = proportion), color = "white", size = 0.1) +
+  scale_fill_continuous(
+    low = colors$blue$`100`,
+    high = colors$blue$`900`,
+    name = "Proportion",
+    labels = scales::percent,
+    na.value = "grey90"
+  ) +
+  facet_wrap(~ race_ethnicity, ncol = 3, nrow = 3) +
+  labs(
+    title = "Proportion Receiving Comprehensive Postnatal Care by Race",
+    fill = "Proportion",
+    caption = "Source: Simulated Data"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+    strip.text = element_text(size = 10)
+  )
+
+```
