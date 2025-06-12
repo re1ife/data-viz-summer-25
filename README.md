@@ -15,18 +15,20 @@ We will use Kieran Healy's **Data Visualization: A Practical Introduction**, [av
 ## Repository Structure
 
 ```
-├── assignments/       # Course assignments
-├── data/              # Selected data sets
-├── data/raw/          # Raw data sets we rely upon
-├── data/processed     # Processed data sets created by course files
-├── docs/              # Rendered notebooks for the course website
-├── lectures/          # Course lecture materials and slides
-├── examples/          # Worked examples and code samples
-├── work/              # Student work and assignments (your work goes here)
-├── scratch/           # Temporary files and experiments (.gitignored)
-├── Syllabux.docx      # Copy of course syllabus
-├── .gitignore         # Git ignore rules
-└── README.md          # This document
+📊 data-viz-summer-25
+├── assignments/        # Course assignments
+├── data/               # Selected data sets
+│   ├── raw/            # Raw data from various sources
+│   └── processed/      # Processed data sets
+├── docs/               # Rendered notebooks for the course website
+├── examples/           # Worked examples and code samples
+├── lectures/           # Course lecture materials and slides
+├── postmortems/        # Daily postmortem reflections
+├── scratch/            # Temporary files and experiments (.gitignored)
+├── work/               # Student work and assignments (your work goes here)
+├── Syllabus.docx       # Copy of course syllabus
+├── .gitignore          # Git ignore rules
+└── README.md           # This document
 ```
 
 ## Getting Started
