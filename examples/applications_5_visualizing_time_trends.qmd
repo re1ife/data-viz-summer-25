@@ -459,7 +459,7 @@ p_weight <- ggplot(daily_averages, aes(x = date, y = avg_weight, color = gender)
   ) +
   # Add labels
   labs(
-    title = "Average Weight Over Time by Sex",
+    title = "Average Weight Over Time by Gender",
     x = "Date",
     y = "Weight (lbs)",
     caption = "Shaded area indicates holiday season (November 1 - December 31).\nText annotations show average weights on November 1 and December 31."
