@@ -5,6 +5,9 @@ scratch*
 work/data/*
 !work/data/.gitkeep
 
+# Large data files
+data/raw/cdc_PRAMStat_Data_for_2011_20250610.csv
+
 # Quarto
 .quarto/
 *_files/
