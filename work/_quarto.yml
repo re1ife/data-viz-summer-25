@@ -1,0 +1,20 @@
+format: 
+  html:
+    toc: true
+    toc-float: true
+    toc-depth: 4
+    theme: cosmo
+    self-contained: true
+    code-fold: true
+    code-tools: true
+    df-print: paged
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  error: false
+  cache: true
+
+editor:
+  render-on-save: true 
